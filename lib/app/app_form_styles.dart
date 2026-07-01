@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+const Color moneyPurple = Color(0xFF7329E7);
+const Color moneyDeepPurple = Color(0xFF2E115B);
+const Color moneyGold = Color(0xFFE6BA53);
+const Color moneyDark = Color(0xFF05040B);
+const Color moneyCardDark = Color(0xFF111827);
+const Color moneySoftPurple = Color(0xFFB47AE7);
+
 bool appIsDarkMode(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark;
 }
@@ -53,7 +60,7 @@ InputDecoration appInputDecoration(
     labelStyle: appFieldLabelStyle(context),
     hintStyle: appFieldHintStyle(context),
     floatingLabelStyle: TextStyle(
-      color: dark ? Colors.white : const Color(0xFF2563EB),
+      color: dark ? moneyGold : moneyPurple,
       fontSize: 14,
       fontWeight: FontWeight.w800,
     ),
@@ -76,7 +83,7 @@ InputDecoration appInputDecoration(
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
       borderSide: const BorderSide(
-        color: Color(0xFF2563EB),
+        color: moneyPurple,
         width: 1.5,
       ),
     ),
@@ -104,7 +111,7 @@ InputDecoration appInputDecoration(
 
 Color appSheetBackgroundColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return dark ? const Color(0xFF0F172A) : const Color(0xFFF6F8FB);
+  return dark ? const Color(0xFF05040B) : const Color(0xFFF6F8FB);
 }
 
 Color appCardBackgroundColor(BuildContext context) {
@@ -132,3 +139,25 @@ Color appDarkPreviewColor(BuildContext context) {
   return dark ? const Color(0xFF020617) : const Color(0xFF111827);
 }
 
+Color appAccentColor(BuildContext context) {
+  return moneyPurple;
+}
+
+Color appPremiumAccentColor(BuildContext context) {
+  return moneyGold;
+}
+
+Color appAccentSoftColor(BuildContext context) {
+  final dark = appIsDarkMode(context);
+  return moneyPurple.withValues(alpha: dark ? 0.24 : 0.12);
+}
+
+Color appPremiumSoftColor(BuildContext context) {
+  final dark = appIsDarkMode(context);
+  return moneyGold.withValues(alpha: dark ? 0.22 : 0.14);
+}
+
+Color appAccentTextColor(BuildContext context) {
+  final dark = appIsDarkMode(context);
+  return dark ? moneySoftPurple : moneyPurple;
+}

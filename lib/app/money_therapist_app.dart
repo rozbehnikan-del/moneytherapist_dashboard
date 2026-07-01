@@ -7,13 +7,20 @@ import 'splash_page.dart';
 class MoneyTherapistApp extends StatelessWidget {
   const MoneyTherapistApp({super.key});
 
+  static const Color moneyPurple = Color(0xFF7329E7);
+  static const Color moneyDeepPurple = Color(0xFF2E115B);
+  static const Color moneyGold = Color(0xFFE6BA53);
+  static const Color moneyDark = Color(0xFF05040B);
+  static const Color moneyCardDark = Color(0xFF111827);
+  static const Color moneySoftPurple = Color(0xFFB47AE7);
+
   @override
   Widget build(BuildContext context) {
     final telegram = TelegramWebApp.instance;
     final isDark = telegram.isDarkMode;
 
     return MaterialApp(
-      title: 'Money Therapist Dashboard',
+      title: 'MoneyTherapist Dashboard',
       debugShowCheckedModeBanner: false,
       scrollBehavior: const MoneyTherapistScrollBehavior(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
@@ -29,14 +36,14 @@ class MoneyTherapistApp extends StatelessWidget {
     final isDark = brightness == Brightness.dark;
 
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF005B7F),
+      seedColor: moneyPurple,
       brightness: brightness,
     );
 
     final scaffoldBackground =
-        isDark ? const Color(0xFF0F172A) : const Color(0xFFF6F8FB);
+        isDark ? moneyDark : const Color(0xFFF6F8FB);
 
-    final cardColor = isDark ? const Color(0xFF111827) : Colors.white;
+    final cardColor = isDark ? moneyCardDark : Colors.white;
 
     final primaryText = isDark ? Colors.white : const Color(0xFF111827);
 
@@ -47,21 +54,46 @@ class MoneyTherapistApp extends StatelessWidget {
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
-      colorScheme: colorScheme,
+      colorScheme: colorScheme.copyWith(
+        primary: moneyPurple,
+        secondary: moneyGold,
+        surface: cardColor,
+      ),
       scaffoldBackgroundColor: scaffoldBackground,
       canvasColor: scaffoldBackground,
       cardColor: cardColor,
       fontFamily: 'Roboto',
+
+      iconTheme: IconThemeData(
+        color: isDark ? moneySoftPurple : moneyPurple,
+      ),
+
       textTheme: TextTheme(
-        headlineLarge: TextStyle(color: primaryText, fontWeight: FontWeight.w900),
-        headlineMedium: TextStyle(color: primaryText, fontWeight: FontWeight.w900),
-        headlineSmall: TextStyle(color: primaryText, fontWeight: FontWeight.w900),
-        titleLarge: TextStyle(color: primaryText, fontWeight: FontWeight.w800),
-        titleMedium: TextStyle(color: primaryText, fontWeight: FontWeight.w700),
+        headlineLarge: TextStyle(
+          color: primaryText,
+          fontWeight: FontWeight.w900,
+        ),
+        headlineMedium: TextStyle(
+          color: primaryText,
+          fontWeight: FontWeight.w900,
+        ),
+        headlineSmall: TextStyle(
+          color: primaryText,
+          fontWeight: FontWeight.w900,
+        ),
+        titleLarge: TextStyle(
+          color: primaryText,
+          fontWeight: FontWeight.w800,
+        ),
+        titleMedium: TextStyle(
+          color: primaryText,
+          fontWeight: FontWeight.w700,
+        ),
         bodyLarge: TextStyle(color: primaryText),
         bodyMedium: TextStyle(color: secondaryText),
         bodySmall: TextStyle(color: secondaryText),
       ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? const Color(0xFF1F2937) : Colors.white,
@@ -74,10 +106,13 @@ class MoneyTherapistApp extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         floatingLabelStyle: TextStyle(
-          color: isDark ? Colors.white : const Color(0xFF005B7F),
+          color: isDark ? moneyGold : moneyPurple,
           fontWeight: FontWeight.w800,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: borderColor),
@@ -88,7 +123,10 @@ class MoneyTherapistApp extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
+          borderSide: const BorderSide(
+            color: moneyPurple,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -96,41 +134,93 @@ class MoneyTherapistApp extends StatelessWidget {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
+          borderSide: const BorderSide(
+            color: Color(0xFFDC2626),
+            width: 1.5,
+          ),
         ),
       ),
+
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFFFACC15),
-          foregroundColor: const Color(0xFF111111),
+          backgroundColor: moneyPurple,
+          foregroundColor: Colors.white,
           disabledBackgroundColor:
               isDark ? const Color(0xFF334155) : const Color(0xFFD1D5DB),
           disabledForegroundColor:
               isDark ? Colors.white38 : const Color(0xFF6B7280),
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
         ),
       ),
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: isDark ? Colors.white : const Color(0xFF475569),
+          foregroundColor: isDark ? moneyGold : moneyPurple,
           side: BorderSide(
-            color: isDark ? Colors.white24 : const Color(0xFF9CA3AF),
+            color: isDark ? moneyGold : moneyPurple,
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
         ),
       ),
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: const Color(0xFF005B7F),
+          foregroundColor: isDark ? moneyGold : moneyPurple,
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
-      dropdownMenuTheme: DropdownMenuThemeData(
-        textStyle: TextStyle(color: primaryText, fontWeight: FontWeight.w600),
-        menuStyle: MenuStyle(backgroundColor: WidgetStatePropertyAll(cardColor)),
+
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: isDark ? moneyCardDark : Colors.white,
+        indicatorColor: moneyPurple.withValues(alpha: 0.14),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: moneyPurple);
+          }
+
+          return IconThemeData(
+            color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              color: moneyPurple,
+              fontWeight: FontWeight.w800,
+            );
+          }
+
+          return TextStyle(
+            color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+            fontWeight: FontWeight.w600,
+          );
+        }),
       ),
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: isDark ? moneyCardDark : Colors.white,
+        selectedItemColor: moneyPurple,
+        unselectedItemColor: isDark ? Colors.white70 : const Color(0xFF6B7280),
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: TextStyle(
+          color: primaryText,
+          fontWeight: FontWeight.w600,
+        ),
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(cardColor),
+        ),
+      ),
+
       dialogTheme: DialogThemeData(
         backgroundColor: cardColor,
         titleTextStyle: TextStyle(
@@ -138,7 +228,10 @@ class MoneyTherapistApp extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.w900,
         ),
-        contentTextStyle: TextStyle(color: secondaryText, fontSize: 14),
+        contentTextStyle: TextStyle(
+          color: secondaryText,
+          fontSize: 14,
+        ),
       ),
     );
   }
