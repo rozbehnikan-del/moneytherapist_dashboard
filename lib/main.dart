@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app/dastyarical_app.dart';
+import 'app/money_therapist_app.dart';
 import 'core/telegram/telegram_web_app.dart';
 
 void main() {
@@ -8,5 +8,5 @@ void main() {
 
   TelegramWebApp.instance.init();
 
-  runApp(const DastyaricalApp());
+  runApp(const MoneyTherapistApp());
 }

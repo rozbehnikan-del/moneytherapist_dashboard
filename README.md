@@ -1,4 +1,4 @@
-# dastyarical_dashboard
+# money_therapist_dashboard
 
 A new Flutter project.
 

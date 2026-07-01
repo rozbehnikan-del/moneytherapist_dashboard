@@ -9,9 +9,11 @@ class SignalService {
 
   SignalService(this._dio);
 
+  static const String _baseUrl = 'https://sizin8n.launchman.xyz/webhook';
+
   Future<List<SignalModel>> fetchSignalHistory() async {
     final response = await _dio.get(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-signal-history',
+      '$_baseUrl/moneytherapist-signal-history',
       options: Options(
         headers: {
           'Accept': 'application/json',
@@ -52,10 +54,16 @@ class SignalService {
     required String messageText,
     required int targetChatId,
     required String adminUsername,
+
+    // For MoneyTherapist admin check.
+    // If UI does not pass it yet, default keeps current test admin working.
+    int adminTelegramId = 7376947596,
   }) async {
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-signal-send',
+      '$_baseUrl/moneytherapist-signal-send',
       data: {
+        'admin_telegram_id': adminTelegramId,
+        'admin_username': adminUsername,
         'campaign_id': campaignId,
         'title': title,
         'signal_type': signalType,
@@ -68,7 +76,6 @@ class SignalService {
         'risk_level': riskLevel,
         'message_text': messageText,
         'target_chat_id': targetChatId,
-        'admin_username': adminUsername,
       },
       options: Options(
         headers: {
@@ -87,7 +94,7 @@ class SignalService {
 
   Future<List<CampaignModel>> fetchCampaigns() async {
     final response = await _dio.get(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-campaigns',
+      '$_baseUrl/moneytherapist-campaign-list',
       options: Options(
         headers: {
           'Accept': 'application/json',
@@ -116,15 +123,24 @@ class SignalService {
 
   Future<List<CampaignLeadModel>> fetchCampaignLeads({
     required int campaignId,
+    String status = 'all',
+    String segment = 'all',
+    int limit = 50,
+    int offset = 0,
   }) async {
-    final response = await _dio.get(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-campaign-leads',
-      queryParameters: {
+    final response = await _dio.post(
+      '$_baseUrl/moneytherapist-campaign-leads',
+      data: {
         'campaign_id': campaignId,
+        'status': status,
+        'segment': segment,
+        'limit': limit,
+        'offset': offset,
       },
       options: Options(
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
       ),
     );
@@ -149,17 +165,21 @@ class SignalService {
     required String status,
     required String targetSegment,
     required String createdByUsername,
+
+    // Same default admin id for current test admin.
+    int adminTelegramId = 7376947596,
   }) async {
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-campaign-create',
+      '$_baseUrl/moneytherapist-campaign-create',
       data: {
+        'admin_telegram_id': adminTelegramId,
+        'admin_username': createdByUsername,
         'name': name,
         'description': description,
         'start_date': startDate,
         'end_date': endDate,
         'status': status,
         'target_segment': targetSegment,
-        'created_by_username': createdByUsername,
       },
       options: Options(
         headers: {
@@ -176,17 +196,13 @@ class SignalService {
     }
   }
 
-  Future<void> updateCampaignStatus({
+  Future<Map<String, dynamic>> fetchCampaignStatus({
     required int campaignId,
-    required String status,
-    required String updatedByUsername,
   }) async {
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-campaign-status',
+      '$_baseUrl/moneytherapist-campaign-status',
       data: {
         'campaign_id': campaignId,
-        'status': status,
-        'updated_by_username': updatedByUsername,
       },
       options: Options(
         headers: {
@@ -196,10 +212,26 @@ class SignalService {
       ),
     );
 
-    if (response.statusCode == null ||
-        response.statusCode! < 200 ||
-        response.statusCode! >= 300) {
-      throw Exception('Failed to update campaign status');
+    final data = response.data;
+
+    if (data is Map<String, dynamic>) {
+      return data;
     }
+
+    throw Exception('Invalid campaign status response');
+  }
+
+  // NOTE:
+  // This needs a separate backend API if you want real campaign status update.
+  // Current moneytherapist-campaign-status API only READS campaign stats.
+  Future<void> updateCampaignStatus({
+    required int campaignId,
+    required String status,
+    required String updatedByUsername,
+  }) async {
+    throw UnimplementedError(
+      'Campaign status update API is not created yet. '
+      'Create moneytherapist-campaign-update-status first.',
+    );
   }
 }

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import '../core/telegram/telegram_web_app.dart';
 import 'splash_page.dart';
 
-class DastyaricalApp extends StatelessWidget {
-  const DastyaricalApp({super.key});
+class MoneyTherapistApp extends StatelessWidget {
+  const MoneyTherapistApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +13,9 @@ class DastyaricalApp extends StatelessWidget {
     final isDark = telegram.isDarkMode;
 
     return MaterialApp(
-      title: 'Dastyarical Dashboard',
+      title: 'Money Therapist Dashboard',
       debugShowCheckedModeBanner: false,
-      scrollBehavior: const DastyaricalScrollBehavior(),
+      scrollBehavior: const MoneyTherapistScrollBehavior(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       theme: _buildTheme(brightness: Brightness.light),
       darkTheme: _buildTheme(brightness: Brightness.dark),
@@ -144,8 +144,8 @@ class DastyaricalApp extends StatelessWidget {
   }
 }
 
-class DastyaricalScrollBehavior extends MaterialScrollBehavior {
-  const DastyaricalScrollBehavior();
+class MoneyTherapistScrollBehavior extends MaterialScrollBehavior {
+  const MoneyTherapistScrollBehavior();
 
   @override
   Set<PointerDeviceKind> get dragDevices {

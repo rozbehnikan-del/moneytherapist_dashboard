@@ -80,7 +80,7 @@ class _SplashPageState extends State<SplashPage> {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'Dastyarical Expert Dashboard',
+                  'Money Therapist Expert Dashboard',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isDark ? Colors.white : const Color(0xFF111827),
@@ -91,7 +91,7 @@ class _SplashPageState extends State<SplashPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Loading Dastyarical analytics...',
+                  'Loading Money Therapist analytics...',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isDark ? Colors.white70 : const Color(0xFF6B7280),

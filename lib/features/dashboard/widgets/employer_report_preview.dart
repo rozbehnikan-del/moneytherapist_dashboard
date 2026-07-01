@@ -29,7 +29,7 @@ class EmployerReportCard extends StatelessWidget {
     );
 
     return DashboardCard(
-      title: 'Dastyarical Expert Report 🟢',
+      title: 'Money Therapist Expert Report 🟢',
       subtitle: dateFormatter.format(data.timestamp.toLocal()),
       height: 540,
       scrollableContent: true,

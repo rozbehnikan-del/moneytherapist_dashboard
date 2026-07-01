@@ -8,12 +8,14 @@ class BroadcastService {
 
   BroadcastService(this._dio);
 
+  static const String _baseUrl = 'https://sizin8n.launchman.xyz/webhook';
+
   Future<BroadcastAudiencePreview> previewAudience({
     int? campaignId,
     required String targetSegment,
   }) async {
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-broadcast-audience-preview',
+      '$_baseUrl/moneytherapist-broadcast-audience-preview',
       data: {
         if (campaignId != null) 'campaign_id': campaignId,
         'target_segment': targetSegment,
@@ -45,14 +47,17 @@ class BroadcastService {
     DateTime? scheduledAt,
   }) async {
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-broadcast-create',
+      '$_baseUrl/moneytherapist-broadcast-create',
       data: {
         if (campaignId != null) 'campaign_id': campaignId,
         'title': title,
         'message_type': messageType,
         'target_segment': targetSegment,
         'message_text': messageText,
-        'created_by_username': createdByUsername,
+
+        // n8n API expects admin_username
+        'admin_username': createdByUsername,
+
         if (scheduledAt != null) 'scheduled_at': scheduledAt.toIso8601String(),
       },
       options: Options(
@@ -78,10 +83,11 @@ class BroadcastService {
     required String adminUsername,
   }) async {
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-broadcast-send',
+      '$_baseUrl/moneytherapist-broadcast-send',
       data: {
         'broadcast_id': broadcastId,
         'admin_username': adminUsername,
+        'limit': 100,
       },
       options: Options(
         headers: {
@@ -103,7 +109,7 @@ class BroadcastService {
 
   Future<List<BroadcastModel>> fetchBroadcastHistory() async {
     final response = await _dio.get(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-broadcast-history',
+      '$_baseUrl/moneytherapist-broadcast-history',
       options: Options(
         headers: {
           'Accept': 'application/json',

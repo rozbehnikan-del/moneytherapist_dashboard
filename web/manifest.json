@@ -1,6 +1,6 @@
 {
-    "name": "dastyarical_dashboard",
-    "short_name": "dastyarical_dashboard",
+    "name": "money_therapist_dashboard",
+    "short_name": "money_therapist_dashboard",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

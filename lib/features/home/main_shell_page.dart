@@ -152,7 +152,7 @@ class _SideNavigation extends StatelessWidget {
             ),
           const Spacer(),
           Text(
-            'Dastyarical Expert System',
+            'Money Therapist Expert System',
             style: TextStyle(
               color: appSecondaryTextColor(context),
               fontSize: 12,
@@ -198,7 +198,7 @@ class _BrandHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Dastyarical',
+                'Money Therapist',
                 style: TextStyle(
                   color: appPrimaryTextColor(context),
                   fontSize: 20,

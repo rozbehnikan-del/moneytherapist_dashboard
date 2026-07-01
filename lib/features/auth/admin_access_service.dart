@@ -13,7 +13,7 @@ import 'admin_access_model.dart';
     final user = telegram.user;
 
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-admin-me',
+      'https://sizin8n.launchman.xyz/webhook-test/moneytherapist-admin-me',
       data: {
         'telegram_user_id': user?.id,
         // Development fallback. Remove this fallback before production.
@@ -51,7 +51,7 @@ class AdminAccessService {
     final bool isTelegram = telegram.initData.isNotEmpty;
 
     final response = await _dio.post(
-      'https://dastyaricall.wpnv.xyz/webhook/dastyarical-admin-me',
+      'https://sizin8n.launchman.xyz/webhook-test/moneytherapist-admin-me',
       data: {
         // Real Telegram data when inside Telegram
         // Local fallback when testing in Chrome

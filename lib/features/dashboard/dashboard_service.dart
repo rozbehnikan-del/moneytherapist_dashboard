@@ -12,7 +12,7 @@ class DashboardService {
     try {
       final response = await _dio
           .get(
-            'https://dastyaricall.wpnv.xyz/webhook/dastyarical-dashboard-summary',
+            'https://sizin8n.launchman.xyz/webhook-test/moneytherapist-dashboard-summary',
             options: Options(
               headers: {
                 'Accept': 'application/json',

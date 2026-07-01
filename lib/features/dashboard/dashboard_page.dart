@@ -358,7 +358,7 @@ class _DashboardHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Dastyarical Expert Dashboard',
+                'Money Therapist Expert Dashboard',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
