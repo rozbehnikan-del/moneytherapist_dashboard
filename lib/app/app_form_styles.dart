@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
-const Color moneyPurple = Color(0xFF7329E7);
 const Color moneyDeepPurple = Color(0xFF2E115B);
 const Color moneyGold = Color(0xFFE6BA53);
 const Color moneyDark = Color(0xFF05040B);
 const Color moneyCardDark = Color(0xFF111827);
 const Color moneySoftPurple = Color(0xFFB47AE7);
+const Color moneyPurple = Color(0xFF7329E7);
+const Color moneyDarkNav = Color(0xFF111827);
+const Color moneyNavItemDark = Color(0xFF1F2937);
 
 bool appIsDarkMode(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark;

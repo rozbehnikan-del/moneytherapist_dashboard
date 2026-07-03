@@ -41,7 +41,6 @@ class _MainShellPageState extends State<MainShellPage> {
         showBroadcast: false,
       ),
     ),
-  
     _ShellTab(
       label: 'Broadcast',
       icon: Icons.mark_email_read_rounded,
@@ -126,10 +125,12 @@ class _SideNavigation extends StatelessWidget {
     final role = adminRole?.trim().isNotEmpty == true ? adminRole! : 'admin';
 
     return Container(
-      width: 260,
+      width: 280,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: appCardBackgroundColor(context),
+        color: appIsDarkMode(context)
+            ? const Color(0xFF111827)
+            : appCardBackgroundColor(context),
         border: Border(
           right: BorderSide(
             color: appBorderColor(context),
@@ -152,7 +153,7 @@ class _SideNavigation extends StatelessWidget {
             ),
           const Spacer(),
           Text(
-            'Money Therapist Expert System',
+            'MoneyTherapist Expert System',
             style: TextStyle(
               color: appSecondaryTextColor(context),
               fontSize: 12,
@@ -177,19 +178,36 @@ class _BrandHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const moneyPurple = Color(0xFF7329E7);
+    const moneyGold = Color(0xFFE6BA53);
+
     return Row(
       children: [
         Container(
-          height: 46,
-          width: 46,
+          height: 54,
+          width: 54,
           decoration: BoxDecoration(
-            color: const Color(0xFF2563EB),
-            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                moneyPurple,
+                moneyGold,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: moneyPurple.withValues(alpha: 0.25),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: const Icon(
-            Icons.insights_rounded,
+            Icons.auto_graph_rounded,
             color: Colors.white,
-            size: 26,
+            size: 28,
           ),
         ),
         const SizedBox(width: 12),
@@ -198,7 +216,9 @@ class _BrandHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Money Therapist',
+                'MoneyTherapist',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: appPrimaryTextColor(context),
                   fontSize: 20,
@@ -239,19 +259,22 @@ class _SideNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedBg = appIsDarkMode(context)
-        ? const Color(0xFF1E3A8A)
-        : const Color(0xFFEFF6FF);
+    const moneyPurple = Color(0xFF7329E7);
 
-    final selectedColor =
-        appIsDarkMode(context) ? Colors.white : const Color(0xFF2563EB);
+    final selectedBg = moneyPurple.withValues(
+      alpha: appIsDarkMode(context) ? 0.22 : 0.12,
+    );
+
+    final selectedColor = appIsDarkMode(context) ? Colors.white : moneyPurple;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
           padding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 13,
@@ -299,23 +322,118 @@ class _BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: selectedIndex,
-      onDestinationSelected: onSelected,
-      backgroundColor: appCardBackgroundColor(context),
-      indicatorColor: appIsDarkMode(context)
-          ? const Color(0xFF1E3A8A)
-          : const Color(0xFFEFF6FF),
-      destinations: [
-        for (final tab in tabs)
-          NavigationDestination(
-            icon: Icon(tab.icon),
-            label: tab.label,
+    return Container(
+      height: 98,
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
+      decoration: const BoxDecoration(
+        color: Color(0xFF111827),
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFF1F2937),
+            width: 1,
           ),
-      ],
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          for (int i = 0; i < tabs.length; i++)
+            _BottomNavItem(
+              icon: tabs[i].icon,
+              label: tabs[i].label,
+              selected: selectedIndex == i,
+              onTap: () => onSelected(i),
+            ),
+        ],
+      ),
     );
   }
-} 
+}
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  static const Color moneyPurple = Color(0xFF7329E7);
+  static const Color moneyGold = Color(0xFFE6BA53);
+
+  @override
+  Widget build(BuildContext context) {
+    final iconColor = selected ? Colors.white : const Color(0xFFCBD5E1);
+    final textColor = selected ? Colors.white : const Color(0xFFCBD5E1);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: SizedBox(
+        width: 112,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              width: selected ? 82 : 76,
+              height: 40,
+              decoration: BoxDecoration(
+                gradient: selected
+                    ? const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          moneyPurple,
+                          moneyGold,
+                        ],
+                      )
+                    : null,
+                color: selected
+                    ? null
+                    : const Color(0xFF1F2937).withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: moneyPurple.withValues(alpha: 0.32),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: 27,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 14,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                letterSpacing: 0.2,
+                decoration: TextDecoration.none,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _BroadcastTabPage extends StatefulWidget {
   final String? adminUsername;

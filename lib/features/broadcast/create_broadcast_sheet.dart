@@ -27,9 +27,14 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
 
   final _titleController = TextEditingController();
   final _messageController = TextEditingController();
+  final _mediaUrlController = TextEditingController();
+  final _mediaFileIdController = TextEditingController();
+  final _mediaCaptionController = TextEditingController();
+  final _buttonTextController = TextEditingController();
+  final _buttonUrlController = TextEditingController();
 
-  String _messageType = 'follow_up';
-  String _targetSegment = 'campaign_leads';
+  String _messageType = 'text';
+  String _targetSegment = 'all_users';
   int? _campaignId;
 
   bool _isPreviewing = false;
@@ -42,46 +47,89 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
   BroadcastAudiencePreview? _preview;
   BroadcastModel? _createdBroadcast;
 
+  static const List<String> _messageTypes = [
+    'text',
+    'photo',
+    'video',
+    'voice',
+    'audio',
+    'document',
+    'animation',
+  ];
+
+  static const List<String> _targetSegments = [
+    'all_users',
+    'pending_deposit',
+    'verified_users',
+    'qualified_100',
+    'qualified_300',
+    'vip_500',
+    'warm_leads',
+    'engaged_leads',
+    'new_leads',
+    'inactive_7d',
+    'inactive_30d',
+    'has_email',
+    'no_email',
+  ];
+
   @override
   void initState() {
     super.initState();
 
-    if (widget.campaigns.isNotEmpty) {
-      _campaignId = widget.campaigns.first.id;
+    _campaignId = widget.campaigns.isEmpty ? null : widget.campaigns.first.id;
+
+    _titleController.text = 'MoneyTherapist Broadcast';
+    _messageController.text = 'Hello MoneyTherapist users.';
+
+    for (final controller in [
+      _titleController,
+      _messageController,
+      _mediaUrlController,
+      _mediaFileIdController,
+      _mediaCaptionController,
+      _buttonTextController,
+      _buttonUrlController,
+    ]) {
+      controller.addListener(_onFormChanged);
     }
-
-    _titleController.text = 'Follow up campaign leads';
-    _messageController.text =
-        'Hey! Just checking in - do you need help completing your deposit?';
-
-    _titleController.addListener(_refreshPreview);
-    _messageController.addListener(_refreshPreview);
   }
 
-  void _refreshPreview() {
-    if (mounted) {
-      setState(() {});
-    }
+  void _onFormChanged() {
+    if (!mounted) return;
+
+    setState(() {
+      _createdBroadcast = null;
+    });
   }
 
   @override
   void dispose() {
-    _titleController.removeListener(_refreshPreview);
-    _messageController.removeListener(_refreshPreview);
-
-    _titleController.dispose();
-    _messageController.dispose();
+    for (final controller in [
+      _titleController,
+      _messageController,
+      _mediaUrlController,
+      _mediaFileIdController,
+      _mediaCaptionController,
+      _buttonTextController,
+      _buttonUrlController,
+    ]) {
+      controller.removeListener(_onFormChanged);
+      controller.dispose();
+    }
 
     super.dispose();
   }
 
+  bool get _requiresMedia => _messageType != 'text';
+
+  bool get _hasMedia {
+    return _hasValue(_mediaUrlController.text) ||
+        _hasValue(_mediaFileIdController.text);
+  }
+
   Future<void> _previewAudience() async {
     if (!_formKey.currentState!.validate()) return;
-
-    if (_targetSegment == 'campaign_leads' && _campaignId == null) {
-      _showError('Please select a campaign.');
-      return;
-    }
 
     setState(() {
       _isPreviewing = true;
@@ -91,8 +139,9 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
 
     try {
       final result = await widget.service.previewAudience(
-        campaignId: _targetSegment == 'campaign_leads' ? _campaignId : null,
+        campaignId: _campaignId,
         targetSegment: _targetSegment,
+        limit: 10,
       );
 
       if (!mounted) return;
@@ -120,8 +169,13 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       return;
     }
 
-    if (_preview!.count == 0) {
+    if (_preview!.totalRecipients == 0) {
       _showError('No recipients found for this segment.');
+      return;
+    }
+
+    if (_requiresMedia && !_hasMedia) {
+      _showError('This message type needs media URL or Telegram file_id.');
       return;
     }
 
@@ -136,13 +190,20 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
 
     try {
       final broadcast = await widget.service.createBroadcast(
-        campaignId: _targetSegment == 'campaign_leads' ? _campaignId : null,
+        campaignId: _campaignId,
         title: _titleController.text.trim(),
         messageType: _messageType,
         targetSegment: _targetSegment,
         messageText: _messageController.text.trim(),
         createdByUsername: widget.adminUsername ?? 'unknown',
+        mediaUrl: _cleanOptional(_mediaUrlController.text),
+        mediaFileId: _cleanOptional(_mediaFileIdController.text),
+        mediaCaption: _cleanOptional(_mediaCaptionController.text),
+        buttonText: _cleanOptional(_buttonTextController.text),
+        buttonUrl: _cleanOptional(_buttonUrlController.text),
+        sendMode: _scheduleForLater ? 'scheduled' : 'now',
         scheduledAt: _scheduleForLater ? _scheduledDateTime : null,
+        limit: _preview!.totalRecipients,
       );
 
       if (!mounted) return;
@@ -184,11 +245,15 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       final sent = await widget.service.sendBroadcast(
         broadcastId: broadcast.id,
         adminUsername: widget.adminUsername ?? 'unknown',
+        limit: 100,
       );
 
       if (!mounted) return;
 
-      _showSuccess('Broadcast sent to ${sent.sentCount} users.');
+      _showSuccess(
+        'Broadcast ${sent.status}. Sent: ${sent.sentCount}, failed: ${sent.failedCount}.',
+      );
+
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
@@ -210,12 +275,6 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       initialDate: _scheduledDateTime ?? now.add(const Duration(minutes: 10)),
       firstDate: now,
       lastDate: now.add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context),
-          child: child!,
-        );
-      },
     );
 
     if (pickedDate == null || !mounted) return;
@@ -225,12 +284,6 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       initialTime: TimeOfDay.fromDateTime(
         _scheduledDateTime ?? now.add(const Duration(minutes: 10)),
       ),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context),
-          child: child!,
-        );
-      },
     );
 
     if (pickedTime == null || !mounted) return;
@@ -282,6 +335,24 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
     );
   }
 
+  bool _hasValue(String? value) {
+    if (value == null) return false;
+
+    final text = value.trim();
+
+    return text.isNotEmpty &&
+        text.toLowerCase() != 'null' &&
+        text.toLowerCase() != 'undefined';
+  }
+
+  String? _cleanOptional(String value) {
+    final text = value.trim();
+
+    if (!_hasValue(text)) return null;
+
+    return text;
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
@@ -326,20 +397,16 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 6),
-
                 Text(
-                  'Select audience, preview recipients, create draft, then send.',
+                  'Create text, media, button, voice, or scheduled Telegram broadcasts.',
                   style: TextStyle(
                     color: appSecondaryTextColor(context),
                     fontSize: 14,
                     decoration: TextDecoration.none,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Form(
                   key: _formKey,
                   child: Column(
@@ -359,15 +426,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
 
                           return null;
                         },
-                        onChanged: (_) {
-                          setState(() {
-                            _createdBroadcast = null;
-                          });
-                        },
                       ),
-
                       const SizedBox(height: 14),
-
                       DropdownButtonFormField<String>(
                         value: _messageType,
                         style: appFieldTextStyle(context),
@@ -377,50 +437,17 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                           context,
                           label: 'Message type',
                         ),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'signal',
-                            child: Text(
-                              'Signal',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'follow_up',
-                            child: Text(
-                              'Follow-up',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'marketing',
-                            child: Text(
-                              'Marketing',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'education',
-                            child: Text(
-                              'Education',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'retention',
-                            child: Text(
-                              'Retention',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'vip',
-                            child: Text(
-                              'VIP',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                        ],
+                        items: _messageTypes
+                            .map(
+                              (type) => DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(
+                                  _label(type),
+                                  style: appFieldTextStyle(context),
+                                ),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (value) {
                           if (value == null) return;
 
@@ -431,9 +458,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                           });
                         },
                       ),
-
                       const SizedBox(height: 14),
-
                       DropdownButtonFormField<String>(
                         value: _targetSegment,
                         style: appFieldTextStyle(context),
@@ -443,78 +468,17 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                           context,
                           label: 'Target segment',
                         ),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'all_users',
-                            child: Text(
-                              'All Users',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'campaign_leads',
-                            child: Text(
-                              'Campaign Leads',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'pending_deposit',
-                            child: Text(
-                              'Pending Deposit',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'deposited',
-                            child: Text(
-                              'Deposited',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'vip',
-                            child: Text(
-                              'VIP',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'hot_lead',
-                            child: Text(
-                              'Hot Lead',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'no_email',
-                            child: Text(
-                              'No Email',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'inactive_7d',
-                            child: Text(
-                              'Inactive 7d',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'inactive_14d',
-                            child: Text(
-                              'Inactive 14d',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'inactive_30d',
-                            child: Text(
-                              'Inactive 30d',
-                              style: appFieldTextStyle(context),
-                            ),
-                          ),
-                        ],
+                        items: _targetSegments
+                            .map(
+                              (segment) => DropdownMenuItem<String>(
+                                value: segment,
+                                child: Text(
+                                  _label(segment),
+                                  style: appFieldTextStyle(context),
+                                ),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (value) {
                           if (value == null) return;
 
@@ -525,30 +489,36 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                           });
                         },
                       ),
-
-                      if (_targetSegment == 'campaign_leads') ...[
+                      if (widget.campaigns.isNotEmpty) ...[
                         const SizedBox(height: 14),
-                        DropdownButtonFormField<int>(
+                        DropdownButtonFormField<int?>(
                           value: _campaignId,
                           style: appFieldTextStyle(context),
                           dropdownColor: appCardBackgroundColor(context),
                           iconEnabledColor: appSecondaryTextColor(context),
                           decoration: appInputDecoration(
                             context,
-                            label: 'Campaign',
+                            label: 'Campaign filter',
                           ),
-                          items: widget.campaigns
-                              .map(
-                                (campaign) => DropdownMenuItem<int>(
-                                  value: campaign.id,
-                                  child: Text(
-                                    campaign.name,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: appFieldTextStyle(context),
-                                  ),
+                          items: [
+                            DropdownMenuItem<int?>(
+                              value: null,
+                              child: Text(
+                                'No campaign filter',
+                                style: appFieldTextStyle(context),
+                              ),
+                            ),
+                            ...widget.campaigns.map(
+                              (campaign) => DropdownMenuItem<int?>(
+                                value: campaign.id,
+                                child: Text(
+                                  campaign.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: appFieldTextStyle(context),
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            ),
+                          ],
                           onChanged: (value) {
                             setState(() {
                               _campaignId = value;
@@ -556,19 +526,9 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                               _createdBroadcast = null;
                             });
                           },
-                          validator: (value) {
-                            if (_targetSegment == 'campaign_leads' &&
-                                value == null) {
-                              return 'Campaign is required';
-                            }
-
-                            return null;
-                          },
                         ),
                       ],
-
                       const SizedBox(height: 14),
-
                       TextFormField(
                         controller: _messageController,
                         minLines: 5,
@@ -588,18 +548,85 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
 
                           return null;
                         },
-                        onChanged: (_) {
-                          setState(() {
-                            _createdBroadcast = null;
-                          });
+                      ),
+                      if (_requiresMedia) ...[
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _mediaUrlController,
+                          style: appFieldTextStyle(context),
+                          cursorColor: const Color(0xFF2563EB),
+                          decoration: appInputDecoration(
+                            context,
+                            label: _messageType == 'voice'
+                                ? 'Media URL, optional - voice usually uses file_id'
+                                : 'Media URL',
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _mediaFileIdController,
+                          style: appFieldTextStyle(context),
+                          cursorColor: const Color(0xFF2563EB),
+                          decoration: appInputDecoration(
+                            context,
+                            label: _messageType == 'voice'
+                                ? 'Telegram voice file_id'
+                                : 'Telegram file_id, optional',
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        TextFormField(
+                          controller: _mediaCaptionController,
+                          minLines: 2,
+                          maxLines: 4,
+                          style: appFieldTextStyle(context),
+                          cursorColor: const Color(0xFF2563EB),
+                          decoration: appInputDecoration(
+                            context,
+                            label: 'Media caption, optional',
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _buttonTextController,
+                        style: appFieldTextStyle(context),
+                        cursorColor: const Color(0xFF2563EB),
+                        decoration: appInputDecoration(
+                          context,
+                          label: 'Button text, optional',
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _buttonUrlController,
+                        style: appFieldTextStyle(context),
+                        cursorColor: const Color(0xFF2563EB),
+                        decoration: appInputDecoration(
+                          context,
+                          label: 'Button URL, optional',
+                        ),
+                        validator: (value) {
+                          final buttonText = _buttonTextController.text.trim();
+                          final buttonUrl = value?.trim() ?? '';
+
+                          if (buttonText.isNotEmpty && buttonUrl.isEmpty) {
+                            return 'Button URL is required when button text is set.';
+                          }
+
+                          if (buttonUrl.isNotEmpty &&
+                              !buttonUrl.startsWith('http://') &&
+                              !buttonUrl.startsWith('https://')) {
+                            return 'Button URL must start with http:// or https://';
+                          }
+
+                          return null;
                         },
                       ),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 18),
-
                 _ScheduleCard(
                   scheduleForLater: _scheduleForLater,
                   scheduledDateTime: _scheduledDateTime,
@@ -616,25 +643,24 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                   onPickDateTime: _pickScheduledDateTime,
                   formatDateTime: _formatScheduledDateTime,
                 ),
-
                 const SizedBox(height: 18),
-
                 _MessagePreviewCard(
                   title: _titleController.text,
                   messageType: _messageType,
                   targetSegment: _targetSegment,
                   messageText: _messageController.text,
+                  mediaUrl: _mediaUrlController.text,
+                  mediaFileId: _mediaFileIdController.text,
+                  mediaCaption: _mediaCaptionController.text,
+                  buttonText: _buttonTextController.text,
+                  buttonUrl: _buttonUrlController.text,
                   isScheduled: _scheduleForLater,
                   scheduledDateTime: _scheduledDateTime,
                   formatDateTime: _formatScheduledDateTime,
                 ),
-
                 const SizedBox(height: 18),
-
                 if (_preview != null) _AudiencePreviewCard(preview: _preview!),
-
                 const SizedBox(height: 18),
-
                 Row(
                   children: [
                     Expanded(
@@ -678,9 +704,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
@@ -719,6 +743,15 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       ),
     );
   }
+
+  static String _label(String value) {
+    return value
+        .replaceAll('_', ' ')
+        .split(' ')
+        .where((part) => part.isNotEmpty)
+        .map((part) => part[0].toUpperCase() + part.substring(1))
+        .join(' ');
+  }
 }
 
 class _ScheduleCard extends StatelessWidget {
@@ -740,13 +773,7 @@ class _ScheduleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: appCardBackgroundColor(context),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
-      ),
+      decoration: _cardDecoration(context),
       child: Column(
         children: [
           SwitchListTile.adaptive(
@@ -762,7 +789,7 @@ class _ScheduleCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'Create this broadcast now and send it automatically at a specific time.',
+              'Create now and let the scheduled runner send it automatically.',
               style: TextStyle(
                 color: appSecondaryTextColor(context),
                 fontWeight: FontWeight.w500,
@@ -788,6 +815,16 @@ class _ScheduleCard extends StatelessWidget {
       ),
     );
   }
+
+  static BoxDecoration _cardDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: appCardBackgroundColor(context),
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(
+        color: appBorderColor(context),
+      ),
+    );
+  }
 }
 
 class _MessagePreviewCard extends StatelessWidget {
@@ -795,6 +832,11 @@ class _MessagePreviewCard extends StatelessWidget {
   final String messageType;
   final String targetSegment;
   final String messageText;
+  final String mediaUrl;
+  final String mediaFileId;
+  final String mediaCaption;
+  final String buttonText;
+  final String buttonUrl;
   final bool isScheduled;
   final DateTime? scheduledDateTime;
   final String Function(DateTime value) formatDateTime;
@@ -804,6 +846,11 @@ class _MessagePreviewCard extends StatelessWidget {
     required this.messageType,
     required this.targetSegment,
     required this.messageText,
+    required this.mediaUrl,
+    required this.mediaFileId,
+    required this.mediaCaption,
+    required this.buttonText,
+    required this.buttonUrl,
     required this.isScheduled,
     required this.scheduledDateTime,
     required this.formatDateTime,
@@ -811,6 +858,12 @@ class _MessagePreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cleanMedia = mediaFileId.trim().isNotEmpty
+        ? 'Telegram file_id'
+        : mediaUrl.trim().isNotEmpty
+            ? mediaUrl.trim()
+            : null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -848,6 +901,8 @@ class _MessagePreviewCard extends StatelessWidget {
             children: [
               _DarkChip(label: messageType),
               _DarkChip(label: targetSegment),
+              if (cleanMedia != null) _DarkChip(label: cleanMedia),
+              if (buttonText.trim().isNotEmpty) const _DarkChip(label: 'button'),
               if (isScheduled)
                 _DarkChip(
                   label: scheduledDateTime == null
@@ -867,6 +922,38 @@ class _MessagePreviewCard extends StatelessWidget {
               decoration: TextDecoration.none,
             ),
           ),
+          if (mediaCaption.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Caption: ${mediaCaption.trim()}',
+              style: const TextStyle(
+                color: Colors.white60,
+                height: 1.35,
+                decoration: TextDecoration.none,
+              ),
+            ),
+          ],
+          if (buttonText.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Text(
+                buttonText.trim(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -882,6 +969,8 @@ class _AudiencePreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final users = preview.previewUsers;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -909,30 +998,53 @@ class _AudiencePreviewCard extends StatelessWidget {
               Expanded(
                 child: _PreviewMetric(
                   label: 'Recipients',
-                  value: '${preview.count}',
+                  value: '${preview.totalRecipients}',
                 ),
               ),
               Expanded(
                 child: _PreviewMetric(
-                  label: 'Deposited',
-                  value: '${preview.summary.deposited}',
+                  label: 'Verified',
+                  value: '${preview.verifiedRecipients}',
                 ),
               ),
               Expanded(
                 child: _PreviewMetric(
                   label: 'Pending',
-                  value: '${preview.summary.pending}',
+                  value: '${preview.pendingRecipients}',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _PreviewMetric(
+                  label: 'Qualified 100',
+                  value: '${preview.qualified100}',
+                ),
+              ),
+              Expanded(
+                child: _PreviewMetric(
+                  label: 'Qualified 300',
+                  value: '${preview.qualified300}',
+                ),
+              ),
+              Expanded(
+                child: _PreviewMetric(
+                  label: 'VIP 500',
+                  value: '${preview.vip500}',
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           _PreviewMetric(
-            label: 'Total deposit amount',
-            value: _formatMoney(preview.summary.totalDepositAmount),
+            label: 'Verified amount',
+            value: _formatMoney(preview.verifiedAmount),
           ),
           const SizedBox(height: 12),
-          ...preview.users.take(5).map(
+          ...users.take(5).map(
                 (user) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -941,7 +1053,7 @@ class _AudiencePreviewCard extends StatelessWidget {
                         radius: 16,
                         backgroundColor: const Color(0xFF2563EB),
                         child: Text(
-                          user.displayName.substring(0, 1),
+                          user.displayName.substring(0, 1).toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -960,7 +1072,7 @@ class _AudiencePreviewCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        user.depositCompleted ? 'Deposited' : 'Pending',
+                        user.depositCompleted ? 'Verified' : 'Pending',
                         style: TextStyle(
                           color: user.depositCompleted
                               ? const Color(0xFF16A34A)
@@ -973,9 +1085,9 @@ class _AudiencePreviewCard extends StatelessWidget {
                   ),
                 ),
               ),
-          if (preview.users.length > 5)
+          if (users.length > 5)
             Text(
-              '+${preview.users.length - 5} more recipients',
+              '+${users.length - 5} more preview users',
               style: TextStyle(
                 color: appSecondaryTextColor(context),
                 fontWeight: FontWeight.w700,
