@@ -11,11 +11,13 @@ import 'create_broadcast_sheet.dart';
 class BroadcastPage extends StatefulWidget {
   final List<CampaignModel> campaigns;
   final String? adminUsername;
+  final int? adminTelegramUserId;
 
   const BroadcastPage({
     super.key,
     required this.campaigns,
     required this.adminUsername,
+    this.adminTelegramUserId,
   });
 
   @override
@@ -49,6 +51,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
         return CreateBroadcastSheet(
           campaigns: widget.campaigns,
           adminUsername: widget.adminUsername,
+          adminTelegramUserId: widget.adminTelegramUserId,
           service: _service,
         );
       },
@@ -93,7 +96,9 @@ class _BroadcastHeroCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appDarkPreviewColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: appIsDarkMode(context) ? Colors.white12 : Colors.transparent),
+        border: Border.all(
+          color: appIsDarkMode(context) ? Colors.white12 : Colors.transparent,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
@@ -276,7 +281,10 @@ class _BroadcastHistorySection extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: onRefresh,
-                    icon: Icon(Icons.refresh_rounded, color: appSecondaryTextColor(context)),
+                    icon: Icon(
+                      Icons.refresh_rounded,
+                      color: appSecondaryTextColor(context),
+                    ),
                     tooltip: 'Refresh',
                   ),
                 ],
@@ -285,12 +293,13 @@ class _BroadcastHistorySection extends StatelessWidget {
               SizedBox(
                 height: 460,
                 child: Scrollbar(
-                  thumbVisibility: true,
                   child: ListView.builder(
                     physics: const ClampingScrollPhysics(),
                     itemCount: broadcasts.length,
                     itemBuilder: (context, index) {
-                      return _BroadcastHistoryCard(broadcast: broadcasts[index]);
+                      return _BroadcastHistoryCard(
+                        broadcast: broadcasts[index],
+                      );
                     },
                   ),
                 ),
@@ -309,7 +318,9 @@ class _BroadcastHistorySection extends StatelessWidget {
       border: Border.all(color: appBorderColor(context)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(appIsDarkMode(context) ? 0.18 : 0.035),
+          color: Colors.black.withOpacity(
+            appIsDarkMode(context) ? 0.18 : 0.035,
+          ),
           blurRadius: 14,
           offset: const Offset(0, 6),
         ),
@@ -343,14 +354,20 @@ class _BroadcastHistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMM d • HH:mm');
-    final sentAt = broadcast.sentAt == null ? 'Not sent yet' : dateFormat.format(broadcast.sentAt!.toLocal());
-    final scheduledAt = broadcast.scheduledAt == null ? null : dateFormat.format(broadcast.scheduledAt!.toLocal());
+    final sentAt = broadcast.sentAt == null
+        ? 'Not sent yet'
+        : dateFormat.format(broadcast.sentAt!.toLocal());
+    final scheduledAt = broadcast.scheduledAt == null
+        ? null
+        : dateFormat.format(broadcast.scheduledAt!.toLocal());
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: appIsDarkMode(context) ? const Color(0xFF0F172A) : const Color(0xFFF9FAFB),
+        color: appIsDarkMode(context)
+            ? const Color(0xFF0F172A)
+            : const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: appBorderColor(context)),
       ),
@@ -372,9 +389,14 @@ class _BroadcastHistoryCard extends StatelessWidget {
 
           return Row(
             children: [
-              Expanded(flex: 2, child: _BroadcastMainInfo(broadcast: broadcast)),
+              Expanded(
+                flex: 2,
+                child: _BroadcastMainInfo(broadcast: broadcast),
+              ),
               Expanded(child: _BroadcastStats(broadcast: broadcast)),
-              Expanded(child: _BroadcastTime(sentAt: sentAt, scheduledAt: scheduledAt)),
+              Expanded(
+                child: _BroadcastTime(sentAt: sentAt, scheduledAt: scheduledAt),
+              ),
             ],
           );
         },
@@ -390,7 +412,9 @@ class _BroadcastMainInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final message = broadcast.mediaCaption?.trim().isNotEmpty == true ? broadcast.mediaCaption! : broadcast.messageText;
+    final message = broadcast.mediaCaption?.trim().isNotEmpty == true
+        ? broadcast.mediaCaption!
+        : broadcast.messageText;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,7 +434,9 @@ class _BroadcastMainInfo extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          broadcast.campaignName?.trim().isNotEmpty == true ? broadcast.campaignName! : 'No campaign',
+          broadcast.campaignName?.trim().isNotEmpty == true
+              ? broadcast.campaignName!
+              : 'No campaign',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -464,7 +490,10 @@ class _BroadcastStats extends StatelessWidget {
         _SmallStat(label: 'Recipients', value: '${broadcast.totalRecipients}'),
         _SmallStat(label: 'Sent', value: '${broadcast.sentCount}'),
         _SmallStat(label: 'Failed', value: '${broadcast.failedCount}'),
-        _SmallStat(label: 'Rate', value: '${broadcast.sentRatePercent.toStringAsFixed(0)}%'),
+        _SmallStat(
+          label: 'Rate',
+          value: '${broadcast.sentRatePercent.toStringAsFixed(0)}%',
+        ),
       ],
     );
   }
@@ -484,14 +513,23 @@ class _BroadcastTime extends StatelessWidget {
         if (scheduledAt != null) ...[
           Row(
             children: [
-              Icon(Icons.event_rounded, size: 16, color: appSecondaryTextColor(context)),
+              Icon(
+                Icons.event_rounded,
+                size: 16,
+                color: appSecondaryTextColor(context),
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'Scheduled: $scheduledAt',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: appSecondaryTextColor(context), fontSize: 12, fontWeight: FontWeight.w700, decoration: TextDecoration.none),
+                  style: TextStyle(
+                    color: appSecondaryTextColor(context),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    decoration: TextDecoration.none,
+                  ),
                 ),
               ),
             ],
@@ -500,14 +538,23 @@ class _BroadcastTime extends StatelessWidget {
         ],
         Row(
           children: [
-            Icon(Icons.schedule_rounded, size: 16, color: appSecondaryTextColor(context)),
+            Icon(
+              Icons.schedule_rounded,
+              size: 16,
+              color: appSecondaryTextColor(context),
+            ),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
                 sentAt,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: appSecondaryTextColor(context), fontSize: 12, fontWeight: FontWeight.w700, decoration: TextDecoration.none),
+                style: TextStyle(
+                  color: appSecondaryTextColor(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.none,
+                ),
               ),
             ),
           ],
@@ -532,11 +579,21 @@ class _SmallStat extends StatelessWidget {
         children: [
           Text(
             value,
-            style: TextStyle(color: appPrimaryTextColor(context), fontSize: 18, fontWeight: FontWeight.w900, decoration: TextDecoration.none),
+            style: TextStyle(
+              color: appPrimaryTextColor(context),
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              decoration: TextDecoration.none,
+            ),
           ),
           Text(
             label,
-            style: TextStyle(color: appSecondaryTextColor(context), fontSize: 11, fontWeight: FontWeight.w700, decoration: TextDecoration.none),
+            style: TextStyle(
+              color: appSecondaryTextColor(context),
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              decoration: TextDecoration.none,
+            ),
           ),
         ],
       ),
@@ -580,10 +637,18 @@ class _BroadcastStatusPill extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.w900, decoration: TextDecoration.none),
+        style: TextStyle(
+          color: textColor,
+          fontSize: 11,
+          fontWeight: FontWeight.w900,
+          decoration: TextDecoration.none,
+        ),
       ),
     );
   }

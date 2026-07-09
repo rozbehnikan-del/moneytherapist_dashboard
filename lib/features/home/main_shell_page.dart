@@ -10,11 +10,13 @@ import 'package:dio/dio.dart';
 
 class MainShellPage extends StatefulWidget {
   final String? adminUsername;
+  final int? adminTelegramUserId;
   final String? adminRole;
 
   const MainShellPage({
     super.key,
     required this.adminUsername,
+    required this.adminTelegramUserId,
     required this.adminRole,
   });
 
@@ -46,6 +48,7 @@ class _MainShellPageState extends State<MainShellPage> {
       icon: Icons.mark_email_read_rounded,
       page: _BroadcastTabPage(
         adminUsername: widget.adminUsername,
+        adminTelegramUserId: widget.adminTelegramUserId,
       ),
     ),
   ];
@@ -437,9 +440,11 @@ class _BottomNavItem extends StatelessWidget {
 
 class _BroadcastTabPage extends StatefulWidget {
   final String? adminUsername;
+  final int? adminTelegramUserId;
 
   const _BroadcastTabPage({
     required this.adminUsername,
+    required this.adminTelegramUserId,
   });
 
   @override
@@ -543,6 +548,7 @@ class _BroadcastTabPageState extends State<_BroadcastTabPage> {
                   return BroadcastPage(
                     campaigns: snapshot.data ?? [],
                     adminUsername: widget.adminUsername,
+                    adminTelegramUserId: widget.adminTelegramUserId,
                   );
                 },
               ),

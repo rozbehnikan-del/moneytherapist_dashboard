@@ -18,62 +18,80 @@ class KpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = appIsDarkMode(context);
-
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: appBorderColor(context),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(dark ? 0.18 : 0.04),
+            color: Colors.black.withOpacity(
+              appIsDarkMode(context) ? 0.18 : 0.04,
+            ),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xFF2563EB),
-            size: 28,
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w900,
-              color: appPrimaryTextColor(context),
-              decoration: TextDecoration.none,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: dark ? Colors.white70 : const Color(0xFF374151),
-              decoration: TextDecoration.none,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 12,
-              color: appSecondaryTextColor(context),
-              decoration: TextDecoration.none,
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isSmall = constraints.maxWidth < 180;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: const Color(0xFF2563EB),
+                size: isSmall ? 28 : 34,
+              ),
+              const Spacer(),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.visible,
+                  style: TextStyle(
+                    color: appPrimaryTextColor(context),
+                    fontSize: isSmall ? 26 : 32,
+                    fontWeight: FontWeight.w900,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: appPrimaryTextColor(context),
+                  fontSize: isSmall ? 14 : 16,
+                  fontWeight: FontWeight.w900,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: appSecondaryTextColor(context),
+                  fontSize: isSmall ? 11 : 13,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

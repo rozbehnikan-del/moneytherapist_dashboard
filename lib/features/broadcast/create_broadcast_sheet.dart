@@ -9,12 +9,14 @@ import 'broadcast_service.dart';
 class CreateBroadcastSheet extends StatefulWidget {
   final List<CampaignModel> campaigns;
   final String? adminUsername;
+  final int? adminTelegramUserId;
   final BroadcastService service;
 
   const CreateBroadcastSheet({
     super.key,
     required this.campaigns,
     required this.adminUsername,
+    this.adminTelegramUserId,
     required this.service,
   });
 
@@ -129,7 +131,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
   }
 
   Future<void> _previewAudience() async {
-    if (!_formKey.currentState!.validate()) return;
+    final formState = _formKey.currentState;
+    if (formState != null && !formState.validate()) return;
 
     setState(() {
       _isPreviewing = true;
@@ -162,7 +165,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
   }
 
   Future<void> _createDraft() async {
-    if (!_formKey.currentState!.validate()) return;
+    final formState = _formKey.currentState;
+    if (formState != null && !formState.validate()) return;
 
     if (_preview == null) {
       _showError('Preview audience first.');
@@ -196,6 +200,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
         targetSegment: _targetSegment,
         messageText: _messageController.text.trim(),
         createdByUsername: widget.adminUsername ?? 'unknown',
+        createdByTelegramId: widget.adminTelegramUserId,
         mediaUrl: _cleanOptional(_mediaUrlController.text),
         mediaFileId: _cleanOptional(_mediaFileIdController.text),
         mediaCaption: _cleanOptional(_mediaCaptionController.text),
@@ -538,9 +543,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                         decoration: appInputDecoration(
                           context,
                           label: 'Message text',
-                        ).copyWith(
-                          alignLabelWithHint: true,
-                        ),
+                        ).copyWith(alignLabelWithHint: true),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return 'Message text is required';
@@ -670,7 +673,9 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Icon(Icons.people_alt_rounded),
                         label: Text(
@@ -686,7 +691,9 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : Icon(
                                 _scheduleForLater
@@ -697,8 +704,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                           _isCreating
                               ? 'Creating...'
                               : _scheduleForLater
-                                  ? 'Schedule'
-                                  : 'Create Draft',
+                              ? 'Schedule'
+                              : 'Create Draft',
                         ),
                       ),
                     ),
@@ -708,7 +715,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: _createdBroadcast == null ||
+                    onPressed:
+                        _createdBroadcast == null ||
                             _isSending ||
                             _createdBroadcast!.status.toLowerCase() ==
                                 'scheduled'
@@ -725,11 +733,11 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                       _createdBroadcast == null
                           ? 'Create draft before sending'
                           : _createdBroadcast!.status.toLowerCase() ==
-                                  'scheduled'
-                              ? 'Scheduled - will send automatically'
-                              : _isSending
-                                  ? 'Sending...'
-                                  : 'Send Broadcast',
+                                'scheduled'
+                          ? 'Scheduled - will send automatically'
+                          : _isSending
+                          ? 'Sending...'
+                          : 'Send Broadcast',
                     ),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
@@ -820,9 +828,7 @@ class _ScheduleCard extends StatelessWidget {
     return BoxDecoration(
       color: appCardBackgroundColor(context),
       borderRadius: BorderRadius.circular(18),
-      border: Border.all(
-        color: appBorderColor(context),
-      ),
+      border: Border.all(color: appBorderColor(context)),
     );
   }
 }
@@ -861,8 +867,8 @@ class _MessagePreviewCard extends StatelessWidget {
     final cleanMedia = mediaFileId.trim().isNotEmpty
         ? 'Telegram file_id'
         : mediaUrl.trim().isNotEmpty
-            ? mediaUrl.trim()
-            : null;
+        ? mediaUrl.trim()
+        : null;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -902,7 +908,8 @@ class _MessagePreviewCard extends StatelessWidget {
               _DarkChip(label: messageType),
               _DarkChip(label: targetSegment),
               if (cleanMedia != null) _DarkChip(label: cleanMedia),
-              if (buttonText.trim().isNotEmpty) const _DarkChip(label: 'button'),
+              if (buttonText.trim().isNotEmpty)
+                const _DarkChip(label: 'button'),
               if (isScheduled)
                 _DarkChip(
                   label: scheduledDateTime == null
@@ -963,9 +970,7 @@ class _MessagePreviewCard extends StatelessWidget {
 class _AudiencePreviewCard extends StatelessWidget {
   final BroadcastAudiencePreview preview;
 
-  const _AudiencePreviewCard({
-    required this.preview,
-  });
+  const _AudiencePreviewCard({required this.preview});
 
   @override
   Widget build(BuildContext context) {
@@ -976,9 +981,7 @@ class _AudiencePreviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1044,7 +1047,9 @@ class _AudiencePreviewCard extends StatelessWidget {
             value: _formatMoney(preview.verifiedAmount),
           ),
           const SizedBox(height: 12),
-          ...users.take(5).map(
+          ...users
+              .take(5)
+              .map(
                 (user) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -1116,10 +1121,7 @@ class _PreviewMetric extends StatelessWidget {
   final String label;
   final String value;
 
-  const _PreviewMetric({
-    required this.label,
-    required this.value,
-  });
+  const _PreviewMetric({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -1152,17 +1154,12 @@ class _PreviewMetric extends StatelessWidget {
 class _DarkChip extends StatelessWidget {
   final String label;
 
-  const _DarkChip({
-    required this.label,
-  });
+  const _DarkChip({required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.10),
         borderRadius: BorderRadius.circular(999),

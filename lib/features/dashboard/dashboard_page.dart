@@ -128,7 +128,7 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currency = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final currency = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

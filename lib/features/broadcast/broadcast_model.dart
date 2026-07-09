@@ -65,7 +65,7 @@ class BroadcastModel {
 
   factory BroadcastModel.fromJson(Map<String, dynamic> json) {
     return BroadcastModel(
-      id: _toInt(json['id']),
+      id: _toInt(json['id'] ?? json['broadcast_id']),
       campaignId: _toNullableInt(json['campaign_id']),
       campaignName: _cleanNullable(json['campaign_name']),
       title: _cleanNullable(json['title']) ?? 'Untitled broadcast',

@@ -56,6 +56,7 @@ class _AdminGateState extends State<AdminGate> {
 
         return MainShellPage(
           adminUsername: access.telegramUsername,
+          adminTelegramUserId: access.telegramUserId,
           adminRole: access.role,
         );
       },

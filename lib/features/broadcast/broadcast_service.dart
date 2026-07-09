@@ -41,7 +41,7 @@ class BroadcastService {
     required String targetSegment,
     required String messageText,
     required String createdByUsername,
-    String? createdByTelegramId,
+    int? createdByTelegramId,
     String? mediaUrl,
     String? mediaFileId,
     String? mediaCaption,
@@ -60,7 +60,7 @@ class BroadcastService {
         'target_segment': targetSegment.trim(),
         'message_text': messageText.trim(),
         'admin_username': createdByUsername.replaceAll('@', '').trim(),
-        if (_hasValue(createdByTelegramId)) 'admin_telegram_id': createdByTelegramId!.trim(),
+        if (createdByTelegramId != null) 'admin_telegram_id': createdByTelegramId,
         if (_hasValue(mediaUrl)) 'media_url': mediaUrl!.trim(),
         if (_hasValue(mediaFileId)) 'media_file_id': mediaFileId!.trim(),
         if (_hasValue(mediaCaption)) 'media_caption': mediaCaption!.trim(),
@@ -74,8 +74,9 @@ class BroadcastService {
     );
 
     final data = response.data;
-    if (data is Map && data['broadcast'] is Map) {
-      return BroadcastModel.fromJson(Map<String, dynamic>.from(data['broadcast'] as Map));
+    final broadcast = _readBroadcast(data);
+    if (broadcast != null) {
+      return broadcast;
     }
     throw Exception('Invalid broadcast create response');
   }
@@ -96,8 +97,9 @@ class BroadcastService {
     );
 
     final data = response.data;
-    if (data is Map && data['broadcast'] is Map) {
-      return BroadcastModel.fromJson(Map<String, dynamic>.from(data['broadcast'] as Map));
+    final broadcast = _readBroadcast(data);
+    if (broadcast != null) {
+      return broadcast;
     }
     throw Exception('Invalid broadcast send response');
   }
@@ -135,5 +137,22 @@ class BroadcastService {
     if (value == null) return false;
     final text = value.trim();
     return text.isNotEmpty && text.toLowerCase() != 'null' && text.toLowerCase() != 'undefined';
+  }
+
+  BroadcastModel? _readBroadcast(dynamic data) {
+    if (data is! Map) return null;
+
+    final map = Map<String, dynamic>.from(data);
+    final wrapped = map['broadcast'] ?? map['data'] ?? map['result'];
+
+    if (wrapped is Map) {
+      return BroadcastModel.fromJson(Map<String, dynamic>.from(wrapped));
+    }
+
+    if (map.containsKey('id') || map.containsKey('broadcast_id')) {
+      return BroadcastModel.fromJson(map);
+    }
+
+    return null;
   }
 }
