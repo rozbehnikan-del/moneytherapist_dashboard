@@ -49,7 +49,28 @@ class AdminAccessService {
       throw Exception('Invalid admin access response');
     }
 
-    return AdminAccessModel.fromJson(data);
+    final access = AdminAccessModel.fromJson(data).withFallback(
+      telegramUserId: user?.id,
+      telegramUsername: user?.username,
+      role: _isKnownOwner(user) ? 'owner' : null,
+    );
+
+    if (access.allowed && _isKnownOwner(user)) {
+      return AdminAccessModel(
+        allowed: true,
+        id: access.id,
+        telegramUserId: access.telegramUserId,
+        telegramUsername: access.telegramUsername,
+        role: 'owner',
+      );
+    }
+
+    return access;
+  }
+
+  bool _isKnownOwner(TelegramUser? user) {
+    final username = user?.username?.trim().toLowerCase();
+    return user?.id == 7376947596 || username == 'radicalaai';
   }
 
   bool get _isLocalHost {

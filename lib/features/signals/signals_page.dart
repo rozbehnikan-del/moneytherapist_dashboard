@@ -40,12 +40,12 @@ class _SignalsPageState extends State<SignalsPage> {
   Future<List<CampaignLeadModel>>? _futureCampaignLeads;
 
   bool get _canManage {
-    final role = widget.adminRole?.toLowerCase();
+    final role = widget.adminRole?.trim().toLowerCase();
     return role == 'owner' || role == 'admin';
   }
 
   bool get _canBroadcast {
-    final role = widget.adminRole?.toLowerCase();
+    final role = widget.adminRole?.trim().toLowerCase();
     return role == 'owner' || role == 'admin';
   }
 
