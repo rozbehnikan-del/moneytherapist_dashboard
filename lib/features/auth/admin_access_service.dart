@@ -29,8 +29,8 @@ class AdminAccessService {
       _adminUrl,
       data: {
         'telegram_user_id': user?.id,
-        // 'telegram_username': user?.username,
-        'telegram_username': user?.username ?? 'RadicalaAI',
+        'telegram_username': user?.username,
+        // 'telegram_username': user?.username ?? 'RadicalaAI',
         'init_data': telegram.initData,
       },
       options: Options(

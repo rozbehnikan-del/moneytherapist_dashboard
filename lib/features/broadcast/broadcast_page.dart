@@ -165,7 +165,7 @@ class _BroadcastText extends StatelessWidget {
         ),
         SizedBox(height: 8),
         Text(
-          'Send text, buttons, photo, video, voice, and scheduled campaigns to clean lead segments.',
+          'Send text, photo, video, voice, and scheduled campaigns to clean lead segments.',
           style: TextStyle(
             color: Colors.white70,
             fontSize: 15,
@@ -415,6 +415,7 @@ class _BroadcastMainInfo extends StatelessWidget {
     final message = broadcast.mediaCaption?.trim().isNotEmpty == true
         ? broadcast.mediaCaption!
         : broadcast.messageText;
+    final isText = broadcast.messageType.toLowerCase() == 'text';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,7 +449,11 @@ class _BroadcastMainInfo extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          message,
+          isText
+              ? message
+              : message.trim().isEmpty
+              ? '${broadcast.messageType} broadcast'
+              : 'Caption: $message',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -467,8 +472,7 @@ class _BroadcastMainInfo extends StatelessWidget {
             _LightChip(label: broadcast.messageType),
             _LightChip(label: broadcast.targetSegment),
             _LightChip(label: broadcast.sendMode),
-            if (broadcast.hasMedia) const _LightChip(label: 'media'),
-            if (broadcast.hasButton) const _LightChip(label: 'button'),
+            if (!isText && broadcast.hasMedia) const _LightChip(label: 'media'),
           ],
         ),
       ],

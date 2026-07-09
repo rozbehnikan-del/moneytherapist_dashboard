@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import '../../app/app_form_styles.dart';
 import '../signals/campaign_model.dart';
 import 'broadcast_audience_model.dart';
+import 'broadcast_media_pick_result.dart';
+import 'broadcast_media_picker.dart';
 import 'broadcast_model.dart';
 import 'broadcast_service.dart';
+import 'broadcast_voice_recorder.dart';
 
 class CreateBroadcastSheet extends StatefulWidget {
   final List<CampaignModel> campaigns;
@@ -31,9 +34,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
   final _messageController = TextEditingController();
   final _mediaUrlController = TextEditingController();
   final _mediaFileIdController = TextEditingController();
-  final _mediaCaptionController = TextEditingController();
-  final _buttonTextController = TextEditingController();
-  final _buttonUrlController = TextEditingController();
+  final _mediaFileIdFocusNode = FocusNode();
+  final _mediaUrlFocusNode = FocusNode();
 
   String _messageType = 'text';
   String _targetSegment = 'all_users';
@@ -42,6 +44,10 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
   bool _isPreviewing = false;
   bool _isCreating = false;
   bool _isSending = false;
+  bool _isUploadingMedia = false;
+  bool _isRecordingVoice = false;
+  String? _selectedMediaFileName;
+  BroadcastVoiceRecordingSession? _voiceRecordingSession;
 
   bool _scheduleForLater = false;
   DateTime? _scheduledDateTime;
@@ -54,9 +60,6 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
     'photo',
     'video',
     'voice',
-    'audio',
-    'document',
-    'animation',
   ];
 
   static const List<String> _targetSegments = [
@@ -89,9 +92,6 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       _messageController,
       _mediaUrlController,
       _mediaFileIdController,
-      _mediaCaptionController,
-      _buttonTextController,
-      _buttonUrlController,
     ]) {
       controller.addListener(_onFormChanged);
     }
@@ -112,18 +112,25 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
       _messageController,
       _mediaUrlController,
       _mediaFileIdController,
-      _mediaCaptionController,
-      _buttonTextController,
-      _buttonUrlController,
     ]) {
       controller.removeListener(_onFormChanged);
       controller.dispose();
     }
 
+    _mediaFileIdFocusNode.dispose();
+    _mediaUrlFocusNode.dispose();
+
     super.dispose();
   }
 
   bool get _requiresMedia => _messageType != 'text';
+
+  bool get _isBusy =>
+      _isPreviewing ||
+      _isCreating ||
+      _isSending ||
+      _isUploadingMedia ||
+      _isRecordingVoice;
 
   bool get _hasMedia {
     return _hasValue(_mediaUrlController.text) ||
@@ -203,9 +210,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
         createdByTelegramId: widget.adminTelegramUserId,
         mediaUrl: _cleanOptional(_mediaUrlController.text),
         mediaFileId: _cleanOptional(_mediaFileIdController.text),
-        mediaCaption: _cleanOptional(_mediaCaptionController.text),
-        buttonText: _cleanOptional(_buttonTextController.text),
-        buttonUrl: _cleanOptional(_buttonUrlController.text),
+        mediaCaption:
+            _requiresMedia ? _cleanOptional(_messageController.text) : null,
         sendMode: _scheduleForLater ? 'scheduled' : 'now',
         scheduledAt: _scheduleForLater ? _scheduledDateTime : null,
         limit: _preview!.totalRecipients,
@@ -231,6 +237,129 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
           _isCreating = false;
         });
       }
+    }
+  }
+
+  Future<void> _pickAndUploadMedia() async {
+    setState(() {
+      _createdBroadcast = null;
+    });
+
+    try {
+      final file = await pickBroadcastMedia(
+        allowedExtensions: _allowedMediaExtensions,
+      );
+
+      if (file == null) {
+        _showError('File picker is only available in the web dashboard.');
+        return;
+      }
+
+      await _uploadPickedMedia(file);
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Attachment upload failed: $e');
+    }
+  }
+
+  Future<void> _startVoiceRecording() async {
+    if (_messageType != 'voice') return;
+
+    setState(() {
+      _createdBroadcast = null;
+    });
+
+    try {
+      final session = await startBroadcastVoiceRecording();
+      if (!mounted) return;
+
+      setState(() {
+        _voiceRecordingSession = session;
+        _isRecordingVoice = true;
+        _selectedMediaFileName = 'Recording voice...';
+        _mediaFileIdController.clear();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Recording failed: $e');
+    }
+  }
+
+  Future<void> _stopVoiceRecording() async {
+    final session = _voiceRecordingSession;
+    if (session == null) return;
+
+    setState(() {
+      _isRecordingVoice = false;
+      _voiceRecordingSession = null;
+      _isUploadingMedia = true;
+    });
+
+    try {
+      final recording = await session.stop();
+      if (!mounted) return;
+
+      await _uploadPickedMedia(recording);
+    } catch (e) {
+      if (!mounted) return;
+      _showError('Voice upload failed: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRecordingVoice = false;
+          _isUploadingMedia = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _uploadPickedMedia(PickedBroadcastMedia file) async {
+    setState(() {
+      _isUploadingMedia = true;
+      _selectedMediaFileName = file.name;
+      _mediaFileIdController.clear();
+    });
+
+    try {
+      final uploaded = await widget.service.uploadBroadcastMedia(
+        messageType: _messageType,
+        fileName: file.name,
+        bytes: file.bytes,
+        contentType: file.contentType,
+        adminUsername: widget.adminUsername ?? 'unknown',
+        adminTelegramUserId: widget.adminTelegramUserId,
+        caption: _messageController.text,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _mediaFileIdController.text = uploaded.mediaFileId;
+        if (_hasValue(uploaded.mediaUrl)) {
+          _mediaUrlController.text = uploaded.mediaUrl!;
+        }
+      });
+
+      _showSuccess('Attachment verified: ${uploaded.fileName ?? file.name}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUploadingMedia = false;
+        });
+      }
+    }
+  }
+
+  List<String> get _allowedMediaExtensions {
+    switch (_messageType) {
+      case 'photo':
+        return const ['jpg', 'jpeg', 'png', 'webp'];
+      case 'video':
+        return const ['mp4', 'mov', 'm4v', 'webm'];
+      case 'voice':
+        return const ['ogg', 'oga', 'opus', 'mp3', 'm4a', 'wav'];
+      default:
+        return const [];
     }
   }
 
@@ -394,7 +523,9 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.of(context).pop(false),
+                      onPressed: _isRecordingVoice
+                          ? () => _showError('Stop the voice recording first.')
+                          : () => Navigator.of(context).pop(false),
                       icon: Icon(
                         Icons.close_rounded,
                         color: appSecondaryTextColor(context),
@@ -404,7 +535,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Create text, media, button, voice, or scheduled Telegram broadcasts.',
+                  'Create simple Telegram-style text, photo, video, or voice broadcasts.',
                   style: TextStyle(
                     color: appSecondaryTextColor(context),
                     fontSize: 14,
@@ -453,15 +584,22 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                               ),
                             )
                             .toList(),
-                        onChanged: (value) {
-                          if (value == null) return;
+                        onChanged: _isBusy
+                            ? null
+                            : (value) {
+                                if (value == null) return;
 
-                          setState(() {
-                            _messageType = value;
-                            _preview = null;
-                            _createdBroadcast = null;
-                          });
-                        },
+                                setState(() {
+                                  _messageType = value;
+                                  _selectedMediaFileName = null;
+                                  _isRecordingVoice = false;
+                                  _voiceRecordingSession = null;
+                                  _mediaUrlController.clear();
+                                  _mediaFileIdController.clear();
+                                  _preview = null;
+                                  _createdBroadcast = null;
+                                });
+                              },
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
@@ -542,10 +680,11 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                         cursorColor: const Color(0xFF2563EB),
                         decoration: appInputDecoration(
                           context,
-                          label: 'Message text',
+                          label: _requiresMedia ? 'Caption' : 'Message text',
                         ).copyWith(alignLabelWithHint: true),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
+                          if (!_requiresMedia &&
+                              (value == null || value.trim().isEmpty)) {
                             return 'Message text is required';
                           }
 
@@ -554,78 +693,27 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                       ),
                       if (_requiresMedia) ...[
                         const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _mediaUrlController,
-                          style: appFieldTextStyle(context),
-                          cursorColor: const Color(0xFF2563EB),
-                          decoration: appInputDecoration(
-                            context,
-                            label: _messageType == 'voice'
-                                ? 'Media URL, optional - voice usually uses file_id'
-                                : 'Media URL',
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _mediaFileIdController,
-                          style: appFieldTextStyle(context),
-                          cursorColor: const Color(0xFF2563EB),
-                          decoration: appInputDecoration(
-                            context,
-                            label: _messageType == 'voice'
-                                ? 'Telegram voice file_id'
-                                : 'Telegram file_id, optional',
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        TextFormField(
-                          controller: _mediaCaptionController,
-                          minLines: 2,
-                          maxLines: 4,
-                          style: appFieldTextStyle(context),
-                          cursorColor: const Color(0xFF2563EB),
-                          decoration: appInputDecoration(
-                            context,
-                            label: 'Media caption, optional',
-                          ),
+                        _MediaAttachmentCard(
+                          messageType: _messageType,
+                          mediaUrlController: _mediaUrlController,
+                          mediaFileIdController: _mediaFileIdController,
+                          mediaUrlFocusNode: _mediaUrlFocusNode,
+                          mediaFileIdFocusNode: _mediaFileIdFocusNode,
+                          hasMedia: _hasMedia,
+                          isUploading: _isUploadingMedia,
+                          isRecordingVoice: _isRecordingVoice,
+                          selectedFileName: _selectedMediaFileName,
+                          onAttach: _isBusy ? null : _pickAndUploadMedia,
+                          onStartVoiceRecording:
+                              _messageType == 'voice' && !_isBusy
+                              ? _startVoiceRecording
+                              : null,
+                          onStopVoiceRecording:
+                              _messageType == 'voice' && _isRecordingVoice
+                              ? _stopVoiceRecording
+                              : null,
                         ),
                       ],
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _buttonTextController,
-                        style: appFieldTextStyle(context),
-                        cursorColor: const Color(0xFF2563EB),
-                        decoration: appInputDecoration(
-                          context,
-                          label: 'Button text, optional',
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _buttonUrlController,
-                        style: appFieldTextStyle(context),
-                        cursorColor: const Color(0xFF2563EB),
-                        decoration: appInputDecoration(
-                          context,
-                          label: 'Button URL, optional',
-                        ),
-                        validator: (value) {
-                          final buttonText = _buttonTextController.text.trim();
-                          final buttonUrl = value?.trim() ?? '';
-
-                          if (buttonText.isNotEmpty && buttonUrl.isEmpty) {
-                            return 'Button URL is required when button text is set.';
-                          }
-
-                          if (buttonUrl.isNotEmpty &&
-                              !buttonUrl.startsWith('http://') &&
-                              !buttonUrl.startsWith('https://')) {
-                            return 'Button URL must start with http:// or https://';
-                          }
-
-                          return null;
-                        },
-                      ),
                     ],
                   ),
                 ),
@@ -654,9 +742,6 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                   messageText: _messageController.text,
                   mediaUrl: _mediaUrlController.text,
                   mediaFileId: _mediaFileIdController.text,
-                  mediaCaption: _mediaCaptionController.text,
-                  buttonText: _buttonTextController.text,
-                  buttonUrl: _buttonUrlController.text,
                   isScheduled: _scheduleForLater,
                   scheduledDateTime: _scheduledDateTime,
                   formatDateTime: _formatScheduledDateTime,
@@ -668,7 +753,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _isPreviewing ? null : _previewAudience,
+                        onPressed: _isBusy ? null : _previewAudience,
                         icon: _isPreviewing
                             ? const SizedBox(
                                 width: 16,
@@ -686,7 +771,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: _isCreating ? null : _createDraft,
+                        onPressed: _isBusy ? null : _createDraft,
                         icon: _isCreating
                             ? const SizedBox(
                                 width: 16,
@@ -718,6 +803,8 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                     onPressed:
                         _createdBroadcast == null ||
                             _isSending ||
+                            _isPreviewing ||
+                            _isCreating ||
                             _createdBroadcast!.status.toLowerCase() ==
                                 'scheduled'
                         ? null
@@ -833,6 +920,225 @@ class _ScheduleCard extends StatelessWidget {
   }
 }
 
+class _MediaAttachmentCard extends StatelessWidget {
+  final String messageType;
+  final TextEditingController mediaUrlController;
+  final TextEditingController mediaFileIdController;
+  final FocusNode mediaUrlFocusNode;
+  final FocusNode mediaFileIdFocusNode;
+  final bool hasMedia;
+  final bool isUploading;
+  final bool isRecordingVoice;
+  final String? selectedFileName;
+  final VoidCallback? onAttach;
+  final VoidCallback? onStartVoiceRecording;
+  final VoidCallback? onStopVoiceRecording;
+
+  const _MediaAttachmentCard({
+    required this.messageType,
+    required this.mediaUrlController,
+    required this.mediaFileIdController,
+    required this.mediaUrlFocusNode,
+    required this.mediaFileIdFocusNode,
+    required this.hasMedia,
+    required this.isUploading,
+    required this.isRecordingVoice,
+    required this.selectedFileName,
+    required this.onAttach,
+    required this.onStartVoiceRecording,
+    required this.onStopVoiceRecording,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final label = _CreateBroadcastSheetState._label(messageType);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: _ScheduleCard._cardDecoration(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2563EB).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF2563EB).withOpacity(0.35),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.attach_file_rounded,
+                  color: Color(0xFF60A5FA),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '$label attachment',
+                  style: TextStyle(
+                    color: appPrimaryTextColor(context),
+                    fontWeight: FontWeight.w900,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
+              if (hasMedia)
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: Color(0xFF16A34A),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: onAttach,
+            icon: isUploading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(_iconForType(messageType)),
+            label: Text(isUploading ? 'Verifying...' : 'Attach $label'),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 48),
+              alignment: Alignment.centerLeft,
+            ),
+          ),
+          if (messageType == 'voice') ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onStartVoiceRecording,
+                    icon: const Icon(Icons.mic_rounded),
+                    label: const Text('Record Voice'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 46),
+                      alignment: Alignment.centerLeft,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: onStopVoiceRecording,
+                    icon: const Icon(Icons.stop_rounded),
+                    label: Text(
+                      isRecordingVoice ? 'Stop & Upload' : 'Stop',
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 46),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (selectedFileName != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(
+                  hasMedia
+                      ? Icons.verified_rounded
+                      : Icons.insert_drive_file_rounded,
+                  size: 16,
+                  color: hasMedia
+                      ? const Color(0xFF16A34A)
+                      : appSecondaryTextColor(context),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    selectedFileName!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: appSecondaryTextColor(context),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: mediaFileIdController,
+            focusNode: mediaFileIdFocusNode,
+            style: appFieldTextStyle(context),
+            cursorColor: const Color(0xFF2563EB),
+            decoration: appInputDecoration(
+              context,
+              label: 'Telegram file_id',
+            ),
+            validator: (_) {
+              if (!hasMedia) {
+                return '$label needs a media URL or Telegram file_id';
+              }
+
+              return null;
+            },
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: mediaUrlController,
+            focusNode: mediaUrlFocusNode,
+            style: appFieldTextStyle(context),
+            cursorColor: const Color(0xFF2563EB),
+            decoration: appInputDecoration(
+              context,
+              label: 'Media URL',
+            ),
+            validator: (value) {
+              final url = value?.trim() ?? '';
+              if (url.isNotEmpty &&
+                  !url.startsWith('http://') &&
+                  !url.startsWith('https://')) {
+                return 'Media URL must start with http:// or https://';
+              }
+
+              return null;
+            },
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Select one ${label.toLowerCase()} file. n8n sends it to Telegram and returns a verified file_id.',
+            style: TextStyle(
+              color: appSecondaryTextColor(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.none,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static IconData _iconForType(String type) {
+    switch (type) {
+      case 'photo':
+        return Icons.image_rounded;
+      case 'video':
+        return Icons.videocam_rounded;
+      case 'voice':
+        return Icons.mic_rounded;
+      default:
+        return Icons.attach_file_rounded;
+    }
+  }
+}
+
 class _MessagePreviewCard extends StatelessWidget {
   final String title;
   final String messageType;
@@ -840,9 +1146,6 @@ class _MessagePreviewCard extends StatelessWidget {
   final String messageText;
   final String mediaUrl;
   final String mediaFileId;
-  final String mediaCaption;
-  final String buttonText;
-  final String buttonUrl;
   final bool isScheduled;
   final DateTime? scheduledDateTime;
   final String Function(DateTime value) formatDateTime;
@@ -854,9 +1157,6 @@ class _MessagePreviewCard extends StatelessWidget {
     required this.messageText,
     required this.mediaUrl,
     required this.mediaFileId,
-    required this.mediaCaption,
-    required this.buttonText,
-    required this.buttonUrl,
     required this.isScheduled,
     required this.scheduledDateTime,
     required this.formatDateTime,
@@ -869,6 +1169,7 @@ class _MessagePreviewCard extends StatelessWidget {
         : mediaUrl.trim().isNotEmpty
         ? mediaUrl.trim()
         : null;
+    final isText = messageType == 'text';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -907,9 +1208,10 @@ class _MessagePreviewCard extends StatelessWidget {
             children: [
               _DarkChip(label: messageType),
               _DarkChip(label: targetSegment),
-              if (cleanMedia != null) _DarkChip(label: cleanMedia),
-              if (buttonText.trim().isNotEmpty)
-                const _DarkChip(label: 'button'),
+              if (!isText)
+                _DarkChip(
+                  label: cleanMedia == null ? 'media required' : cleanMedia,
+                ),
               if (isScheduled)
                 _DarkChip(
                   label: scheduledDateTime == null
@@ -921,7 +1223,9 @@ class _MessagePreviewCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             messageText.trim().isEmpty
-                ? 'Message text will appear here.'
+                ? isText
+                    ? 'Message text will appear here.'
+                    : 'Caption is optional.'
                 : messageText,
             style: const TextStyle(
               color: Colors.white70,
@@ -929,18 +1233,7 @@ class _MessagePreviewCard extends StatelessWidget {
               decoration: TextDecoration.none,
             ),
           ),
-          if (mediaCaption.trim().isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Text(
-              'Caption: ${mediaCaption.trim()}',
-              style: const TextStyle(
-                color: Colors.white60,
-                height: 1.35,
-                decoration: TextDecoration.none,
-              ),
-            ),
-          ],
-          if (buttonText.trim().isNotEmpty) ...[
+          if (!isText) ...[
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
@@ -950,14 +1243,28 @@ class _MessagePreviewCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white12),
               ),
-              child: Text(
-                buttonText.trim(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  decoration: TextDecoration.none,
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    _MediaAttachmentCard._iconForType(messageType),
+                    color: Colors.white70,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      cleanMedia ??
+                          '${_CreateBroadcastSheetState._label(messageType)} attachment needed',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w800,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
