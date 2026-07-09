@@ -47,7 +47,7 @@ class TelegramWebApp {
       if (_webApp == null) return;
 
       _call('ready');
-      _call('expand');
+      _call('enableVerticalSwipes');
       _call('disableClosingConfirmation');
     } catch (_) {
       _webApp = null;
@@ -135,6 +135,10 @@ class TelegramWebApp {
 
   void close() {
     _call('close');
+  }
+
+  void expand() {
+    _call('expand');
   }
 
   void _call(String method) {
