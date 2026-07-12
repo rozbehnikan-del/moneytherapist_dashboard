@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:dio/dio.dart';
 
+import '../../app/dashboard_card.dart';
 import '../../app/app_form_styles.dart';
+import '../../config/project_config.dart';
 import 'dashboard_models.dart';
 import 'dashboard_service.dart';
 import 'widgets/action_card.dart';
@@ -13,11 +15,14 @@ import 'widgets/funnel_card.dart';
 import 'widgets/metric_bar.dart';
 import 'widgets/pi_card.dart';
 import 'widgets/segment_card.dart';
-import '../../app/dashboard_card.dart'; 
-
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final ProjectConfig project;
+
+  const DashboardPage({
+    super.key,
+    required this.project,
+  });
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -107,7 +112,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1280),
-                    child: _DashboardContent(data: data),
+                    child: _DashboardContent(
+                      data: data,
+                      project: widget.project,
+                    ),
                   ),
                 ),
               ),
@@ -121,9 +129,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
 class _DashboardContent extends StatelessWidget {
   final DashboardData data;
+  final ProjectConfig project;
 
   const _DashboardContent({
     required this.data,
+    required this.project,
   });
 
   @override
@@ -133,7 +143,10 @@ class _DashboardContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _DashboardHeader(timestamp: data.timestamp),
+        _DashboardHeader(
+          timestamp: data.timestamp,
+          project: project,
+        ),
 
         const SizedBox(height: 24),
 
@@ -312,9 +325,11 @@ class _DashboardContent extends StatelessWidget {
 
 class _DashboardHeader extends StatelessWidget {
   final DateTime timestamp;
+  final ProjectConfig project;
 
   const _DashboardHeader({
     required this.timestamp,
+    required this.project,
   });
 
   @override
@@ -338,7 +353,7 @@ class _DashboardHeader extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: Image.asset(
-            'assets/images/splash.png',
+            project.splashAssetPath,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
@@ -358,7 +373,7 @@ class _DashboardHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Money Therapist Expert Dashboard',
+                project.splashTitle,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,

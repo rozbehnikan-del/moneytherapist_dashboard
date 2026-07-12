@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_form_styles.dart';
+import '../../config/project_config.dart';
 import '../dashboard/dashboard_page.dart';
 import '../signals/signals_page.dart';
 import '../broadcast/broadcast_page.dart';
@@ -9,12 +10,14 @@ import '../signals/signal_service.dart';
 import 'package:dio/dio.dart';
 
 class MainShellPage extends StatefulWidget {
+  final ProjectConfig project;
   final String? adminUsername;
   final int? adminTelegramUserId;
   final String? adminRole;
 
   const MainShellPage({
     super.key,
+    required this.project,
     required this.adminUsername,
     required this.adminTelegramUserId,
     required this.adminRole,
@@ -31,7 +34,7 @@ class _MainShellPageState extends State<MainShellPage> {
     _ShellTab(
       label: 'Dashboard',
       icon: Icons.dashboard_rounded,
-      page: const DashboardPage(),
+      page: DashboardPage(project: widget.project),
     ),
     _ShellTab(
       label: 'Signals',
@@ -69,6 +72,7 @@ class _MainShellPageState extends State<MainShellPage> {
                 onSelected: _selectTab,
                 adminUsername: widget.adminUsername,
                 adminRole: widget.adminRole,
+                project: widget.project,
               ),
             Expanded(
               child: _tabs[_selectedIndex].page,
@@ -82,6 +86,7 @@ class _MainShellPageState extends State<MainShellPage> {
               tabs: _tabs,
               selectedIndex: _selectedIndex,
               onSelected: _selectTab,
+              project: widget.project,
             ),
     );
   }
@@ -111,6 +116,7 @@ class _SideNavigation extends StatelessWidget {
   final ValueChanged<int> onSelected;
   final String? adminUsername;
   final String? adminRole;
+  final ProjectConfig project;
 
   const _SideNavigation({
     required this.tabs,
@@ -118,6 +124,7 @@ class _SideNavigation extends StatelessWidget {
     required this.onSelected,
     required this.adminUsername,
     required this.adminRole,
+    required this.project,
   });
 
   @override
@@ -132,7 +139,7 @@ class _SideNavigation extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: appIsDarkMode(context)
-            ? const Color(0xFF111827)
+            ? project.cardDarkColor
             : appCardBackgroundColor(context),
         border: Border(
           right: BorderSide(
@@ -146,6 +153,7 @@ class _SideNavigation extends StatelessWidget {
           _BrandHeader(
             username: username,
             role: role,
+            project: project,
           ),
           const SizedBox(height: 24),
           for (int i = 0; i < tabs.length; i++)
@@ -153,10 +161,11 @@ class _SideNavigation extends StatelessWidget {
               tab: tabs[i],
               selected: selectedIndex == i,
               onTap: () => onSelected(i),
+              primaryColor: project.primaryColor,
             ),
           const Spacer(),
           Text(
-            'MoneyTherapist Expert System',
+            project.dashboardSubtitle,
             style: TextStyle(
               color: appSecondaryTextColor(context),
               fontSize: 12,
@@ -173,35 +182,34 @@ class _SideNavigation extends StatelessWidget {
 class _BrandHeader extends StatelessWidget {
   final String username;
   final String role;
+  final ProjectConfig project;
 
   const _BrandHeader({
     required this.username,
     required this.role,
+    required this.project,
   });
 
   @override
   Widget build(BuildContext context) {
-    const moneyPurple = Color(0xFF7329E7);
-    const moneyGold = Color(0xFFE6BA53);
-
     return Row(
       children: [
         Container(
           height: 54,
           width: 54,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                moneyPurple,
-                moneyGold,
+                project.primaryColor,
+                project.secondaryColor,
               ],
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: moneyPurple.withValues(alpha: 0.25),
+                color: project.primaryColor.withValues(alpha: 0.25),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -219,7 +227,7 @@ class _BrandHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'MoneyTherapist',
+                project.displayName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -253,22 +261,22 @@ class _SideNavItem extends StatelessWidget {
   final _ShellTab tab;
   final bool selected;
   final VoidCallback onTap;
+  final Color primaryColor;
 
   const _SideNavItem({
     required this.tab,
     required this.selected,
     required this.onTap,
+    required this.primaryColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    const moneyPurple = Color(0xFF7329E7);
-
-    final selectedBg = moneyPurple.withValues(
+    final selectedBg = primaryColor.withValues(
       alpha: appIsDarkMode(context) ? 0.22 : 0.12,
     );
 
-    final selectedColor = appIsDarkMode(context) ? Colors.white : moneyPurple;
+    final selectedColor = appIsDarkMode(context) ? Colors.white : primaryColor;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -316,11 +324,13 @@ class _BottomNavigation extends StatelessWidget {
   final List<_ShellTab> tabs;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final ProjectConfig project;
 
   const _BottomNavigation({
     required this.tabs,
     required this.selectedIndex,
     required this.onSelected,
+    required this.project,
   });
 
   @override
@@ -328,9 +338,9 @@ class _BottomNavigation extends StatelessWidget {
     return Container(
       height: 98,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
-      decoration: const BoxDecoration(
-        color: Color(0xFF111827),
-        border: Border(
+      decoration: BoxDecoration(
+        color: project.cardDarkColor,
+        border: const Border(
           top: BorderSide(
             color: Color(0xFF1F2937),
             width: 1,
@@ -346,6 +356,8 @@ class _BottomNavigation extends StatelessWidget {
               label: tabs[i].label,
               selected: selectedIndex == i,
               onTap: () => onSelected(i),
+              primaryColor: project.primaryColor,
+              secondaryColor: project.secondaryColor,
             ),
         ],
       ),
@@ -358,16 +370,17 @@ class _BottomNavItem extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final Color primaryColor;
+  final Color secondaryColor;
 
   const _BottomNavItem({
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
+    required this.primaryColor,
+    required this.secondaryColor,
   });
-
-  static const Color moneyPurple = Color(0xFF7329E7);
-  static const Color moneyGold = Color(0xFFE6BA53);
 
   @override
   Widget build(BuildContext context) {
@@ -389,12 +402,12 @@ class _BottomNavItem extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 gradient: selected
-                    ? const LinearGradient(
+                    ? LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          moneyPurple,
-                          moneyGold,
+                          primaryColor,
+                          secondaryColor,
                         ],
                       )
                     : null,
@@ -405,7 +418,7 @@ class _BottomNavItem extends StatelessWidget {
                 boxShadow: selected
                     ? [
                         BoxShadow(
-                          color: moneyPurple.withValues(alpha: 0.32),
+                          color: primaryColor.withValues(alpha: 0.32),
                           blurRadius: 14,
                           offset: const Offset(0, 6),
                         ),

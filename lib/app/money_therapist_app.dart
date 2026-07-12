@@ -1,18 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../config/project_config.dart';
 import '../core/telegram/telegram_web_app.dart';
 import 'splash_page.dart';
 
-class MoneyTherapistApp extends StatelessWidget {
-  const MoneyTherapistApp({super.key});
+class DashboardApp extends StatelessWidget {
+  final ProjectConfig project;
 
-  static const Color moneyPurple = Color(0xFF7329E7);
-  static const Color moneyDeepPurple = Color(0xFF2E115B);
-  static const Color moneyGold = Color(0xFFE6BA53);
-  static const Color moneyDark = Color(0xFF05040B);
-  static const Color moneyCardDark = Color(0xFF111827);
-  static const Color moneySoftPurple = Color(0xFFB47AE7);
+  const DashboardApp({
+    super.key,
+    required this.project,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +19,13 @@ class MoneyTherapistApp extends StatelessWidget {
     final isDark = telegram.isDarkMode;
 
     return MaterialApp(
-      title: 'MoneyTherapist Dashboard',
+      title: project.appTitle,
       debugShowCheckedModeBanner: false,
-      scrollBehavior: const MoneyTherapistScrollBehavior(),
+      scrollBehavior: const DashboardScrollBehavior(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       theme: _buildTheme(brightness: Brightness.light),
       darkTheme: _buildTheme(brightness: Brightness.dark),
-      home: const SplashPage(),
+      home: SplashPage(project: project),
     );
   }
 
@@ -36,14 +35,14 @@ class MoneyTherapistApp extends StatelessWidget {
     final isDark = brightness == Brightness.dark;
 
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: moneyPurple,
+      seedColor: project.primaryColor,
       brightness: brightness,
     );
 
     final scaffoldBackground =
-        isDark ? moneyDark : const Color(0xFFF6F8FB);
+        isDark ? project.darkBackgroundColor : const Color(0xFFF6F8FB);
 
-    final cardColor = isDark ? moneyCardDark : Colors.white;
+    final cardColor = isDark ? project.cardDarkColor : Colors.white;
 
     final primaryText = isDark ? Colors.white : const Color(0xFF111827);
 
@@ -55,8 +54,8 @@ class MoneyTherapistApp extends StatelessWidget {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme.copyWith(
-        primary: moneyPurple,
-        secondary: moneyGold,
+        primary: project.primaryColor,
+        secondary: project.secondaryColor,
         surface: cardColor,
       ),
       scaffoldBackgroundColor: scaffoldBackground,
@@ -65,7 +64,7 @@ class MoneyTherapistApp extends StatelessWidget {
       fontFamily: 'Roboto',
 
       iconTheme: IconThemeData(
-        color: isDark ? moneySoftPurple : moneyPurple,
+        color: isDark ? project.softAccentColor : project.primaryColor,
       ),
 
       textTheme: TextTheme(
@@ -106,7 +105,7 @@ class MoneyTherapistApp extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         floatingLabelStyle: TextStyle(
-          color: isDark ? moneyGold : moneyPurple,
+          color: isDark ? project.secondaryColor : project.primaryColor,
           fontWeight: FontWeight.w800,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -123,8 +122,8 @@ class MoneyTherapistApp extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: moneyPurple,
+          borderSide: BorderSide(
+            color: project.primaryColor,
             width: 1.5,
           ),
         ),
@@ -143,7 +142,7 @@ class MoneyTherapistApp extends StatelessWidget {
 
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: moneyPurple,
+          backgroundColor: project.primaryColor,
           foregroundColor: Colors.white,
           disabledBackgroundColor:
               isDark ? const Color(0xFF334155) : const Color(0xFFD1D5DB),
@@ -158,9 +157,10 @@ class MoneyTherapistApp extends StatelessWidget {
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: isDark ? moneyGold : moneyPurple,
+          foregroundColor:
+              isDark ? project.secondaryColor : project.primaryColor,
           side: BorderSide(
-            color: isDark ? moneyGold : moneyPurple,
+            color: isDark ? project.secondaryColor : project.primaryColor,
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
           shape: RoundedRectangleBorder(
@@ -171,17 +171,18 @@ class MoneyTherapistApp extends StatelessWidget {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: isDark ? moneyGold : moneyPurple,
+          foregroundColor:
+              isDark ? project.secondaryColor : project.primaryColor,
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
 
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: isDark ? moneyCardDark : Colors.white,
-        indicatorColor: moneyPurple.withValues(alpha: 0.14),
+        backgroundColor: isDark ? project.cardDarkColor : Colors.white,
+        indicatorColor: project.primaryColor.withValues(alpha: 0.14),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: moneyPurple);
+            return IconThemeData(color: project.primaryColor);
           }
 
           return IconThemeData(
@@ -190,8 +191,8 @@ class MoneyTherapistApp extends StatelessWidget {
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const TextStyle(
-              color: moneyPurple,
+            return TextStyle(
+              color: project.primaryColor,
               fontWeight: FontWeight.w800,
             );
           }
@@ -204,8 +205,8 @@ class MoneyTherapistApp extends StatelessWidget {
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: isDark ? moneyCardDark : Colors.white,
-        selectedItemColor: moneyPurple,
+        backgroundColor: isDark ? project.cardDarkColor : Colors.white,
+        selectedItemColor: project.primaryColor,
         unselectedItemColor: isDark ? Colors.white70 : const Color(0xFF6B7280),
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
@@ -237,8 +238,8 @@ class MoneyTherapistApp extends StatelessWidget {
   }
 }
 
-class MoneyTherapistScrollBehavior extends MaterialScrollBehavior {
-  const MoneyTherapistScrollBehavior();
+class DashboardScrollBehavior extends MaterialScrollBehavior {
+  const DashboardScrollBehavior();
 
   @override
   Set<PointerDeviceKind> get dragDevices {

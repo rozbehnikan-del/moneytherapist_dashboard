@@ -1,14 +1,5 @@
 import 'package:flutter/material.dart';
 
-const Color moneyDeepPurple = Color(0xFF2E115B);
-const Color moneyGold = Color(0xFFE6BA53);
-const Color moneyDark = Color(0xFF05040B);
-const Color moneyCardDark = Color(0xFF111827);
-const Color moneySoftPurple = Color(0xFFB47AE7);
-const Color moneyPurple = Color(0xFF7329E7);
-const Color moneyDarkNav = Color(0xFF111827);
-const Color moneyNavItemDark = Color(0xFF1F2937);
-
 bool appIsDarkMode(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark;
 }
@@ -62,7 +53,9 @@ InputDecoration appInputDecoration(
     labelStyle: appFieldLabelStyle(context),
     hintStyle: appFieldHintStyle(context),
     floatingLabelStyle: TextStyle(
-      color: dark ? moneyGold : moneyPurple,
+      color: dark
+          ? Theme.of(context).colorScheme.secondary
+          : Theme.of(context).colorScheme.primary,
       fontSize: 14,
       fontWeight: FontWeight.w800,
     ),
@@ -84,8 +77,8 @@ InputDecoration appInputDecoration(
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(
-        color: moneyPurple,
+      borderSide: BorderSide(
+        color: Theme.of(context).colorScheme.primary,
         width: 1.5,
       ),
     ),
@@ -113,12 +106,14 @@ InputDecoration appInputDecoration(
 
 Color appSheetBackgroundColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return dark ? const Color(0xFF05040B) : const Color(0xFFF6F8FB);
+  return dark
+      ? Theme.of(context).scaffoldBackgroundColor
+      : const Color(0xFFF6F8FB);
 }
 
 Color appCardBackgroundColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return dark ? const Color(0xFF111827) : Colors.white;
+  return dark ? Theme.of(context).cardColor : Colors.white;
 }
 
 Color appPrimaryTextColor(BuildContext context) {
@@ -142,24 +137,31 @@ Color appDarkPreviewColor(BuildContext context) {
 }
 
 Color appAccentColor(BuildContext context) {
-  return moneyPurple;
+  return Theme.of(context).colorScheme.primary;
 }
 
 Color appPremiumAccentColor(BuildContext context) {
-  return moneyGold;
+  return Theme.of(context).colorScheme.secondary;
 }
 
 Color appAccentSoftColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return moneyPurple.withValues(alpha: dark ? 0.24 : 0.12);
+  return Theme.of(context).colorScheme.primary.withValues(
+        alpha: dark ? 0.24 : 0.12,
+      );
 }
 
 Color appPremiumSoftColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return moneyGold.withValues(alpha: dark ? 0.22 : 0.14);
+  return Theme.of(context).colorScheme.secondary.withValues(
+        alpha: dark ? 0.22 : 0.14,
+      );
 }
 
 Color appAccentTextColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return dark ? moneySoftPurple : moneyPurple;
+  return dark
+      ? Theme.of(context).iconTheme.color ??
+          Theme.of(context).colorScheme.primary
+      : Theme.of(context).colorScheme.primary;
 }

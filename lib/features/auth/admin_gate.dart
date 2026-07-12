@@ -1,13 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../config/project_config.dart';
 import 'admin_access_model.dart';
 import 'admin_access_service.dart';
 import '../home/main_shell_page.dart';
 
-
-
 class AdminGate extends StatefulWidget {
-  const AdminGate({super.key});
+  final ProjectConfig project;
+
+  const AdminGate({
+    super.key,
+    required this.project,
+  });
 
   @override
   State<AdminGate> createState() => _AdminGateState();
@@ -55,6 +59,7 @@ class _AdminGateState extends State<AdminGate> {
         }
 
         return MainShellPage(
+          project: widget.project,
           adminUsername: access.telegramUsername,
           adminTelegramUserId: access.telegramUserId,
           adminRole: access.role,
