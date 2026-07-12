@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../config/project_config.dart';
 import '../../core/networking/dio_factory.dart';
@@ -15,16 +16,15 @@ class AdminGate extends StatefulWidget {
 }
 
 class _AdminGateState extends State<AdminGate> {
+  late final Dio _dio;
   late final AdminAccessService _service;
   late Future<AdminAccessModel> _futureAccess;
 
   @override
   void initState() {
     super.initState();
-    _service = AdminAccessService(
-      DioFactory.create(widget.project),
-      widget.project,
-    );
+    _dio = DioFactory.create(widget.project);
+    _service = AdminAccessService(_dio, widget.project);
     _futureAccess = _service.checkAccess();
   }
 
@@ -60,6 +60,7 @@ class _AdminGateState extends State<AdminGate> {
 
         return MainShellPage(
           project: widget.project,
+          dio: _dio,
           adminUsername: access.telegramUsername,
           adminTelegramUserId: access.telegramUserId,
           adminRole: access.role,

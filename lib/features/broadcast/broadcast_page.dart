@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,12 +8,14 @@ import 'broadcast_service.dart';
 import 'create_broadcast_sheet.dart';
 
 class BroadcastPage extends StatefulWidget {
+  final BroadcastService service;
   final List<CampaignModel> campaigns;
   final String? adminUsername;
   final int? adminTelegramUserId;
 
   const BroadcastPage({
     super.key,
+    required this.service,
     required this.campaigns,
     required this.adminUsername,
     this.adminTelegramUserId,
@@ -31,7 +32,7 @@ class _BroadcastPageState extends State<BroadcastPage> {
   @override
   void initState() {
     super.initState();
-    _service = BroadcastService(Dio());
+    _service = widget.service;
     _futureBroadcasts = _service.fetchBroadcastHistory();
   }
 

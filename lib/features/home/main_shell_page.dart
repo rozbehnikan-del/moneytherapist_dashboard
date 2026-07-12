@@ -1,16 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/app_form_styles.dart';
 import '../../config/project_config.dart';
+import '../broadcast/broadcast_page.dart';
+import '../broadcast/broadcast_service.dart';
 import '../dashboard/dashboard_page.dart';
 import '../signals/signals_page.dart';
-import '../broadcast/broadcast_page.dart';
 import '../signals/campaign_model.dart';
 import '../signals/signal_service.dart';
-import 'package:dio/dio.dart';
 
 class MainShellPage extends StatefulWidget {
   final ProjectConfig project;
+  final Dio dio;
   final String? adminUsername;
   final int? adminTelegramUserId;
   final String? adminRole;
@@ -18,6 +20,7 @@ class MainShellPage extends StatefulWidget {
   const MainShellPage({
     super.key,
     required this.project,
+    required this.dio,
     required this.adminUsername,
     required this.adminTelegramUserId,
     required this.adminRole,
@@ -34,12 +37,14 @@ class _MainShellPageState extends State<MainShellPage> {
     _ShellTab(
       label: 'Dashboard',
       icon: Icons.dashboard_rounded,
-      page: DashboardPage(project: widget.project),
+      page: DashboardPage(project: widget.project, dio: widget.dio),
     ),
     _ShellTab(
       label: 'Signals',
       icon: Icons.campaign_rounded,
       page: SignalsPage(
+        signalService: SignalService(widget.dio, widget.project),
+        broadcastService: BroadcastService(widget.dio, widget.project),
         adminUsername: widget.adminUsername,
         adminRole: widget.adminRole,
         showHeader: false,
@@ -50,6 +55,8 @@ class _MainShellPageState extends State<MainShellPage> {
       label: 'Broadcast',
       icon: Icons.mark_email_read_rounded,
       page: _BroadcastTabPage(
+        project: widget.project,
+        dio: widget.dio,
         adminUsername: widget.adminUsername,
         adminTelegramUserId: widget.adminTelegramUserId,
       ),
@@ -430,10 +437,14 @@ class _BottomNavItem extends StatelessWidget {
 }
 
 class _BroadcastTabPage extends StatefulWidget {
+  final ProjectConfig project;
+  final Dio dio;
   final String? adminUsername;
   final int? adminTelegramUserId;
 
   const _BroadcastTabPage({
+    required this.project,
+    required this.dio,
     required this.adminUsername,
     required this.adminTelegramUserId,
   });
@@ -449,7 +460,7 @@ class _BroadcastTabPageState extends State<_BroadcastTabPage> {
   @override
   void initState() {
     super.initState();
-    _service = SignalService(Dio());
+    _service = SignalService(widget.dio, widget.project);
     _futureCampaigns = _service.fetchCampaigns();
   }
 
@@ -535,6 +546,7 @@ class _BroadcastTabPageState extends State<_BroadcastTabPage> {
                   }
 
                   return BroadcastPage(
+                    service: BroadcastService(widget.dio, widget.project),
                     campaigns: snapshot.data ?? [],
                     adminUsername: widget.adminUsername,
                     adminTelegramUserId: widget.adminTelegramUserId,

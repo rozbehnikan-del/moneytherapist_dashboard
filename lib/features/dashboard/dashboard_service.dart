@@ -22,6 +22,7 @@ class DashboardService {
       options: Options(
         responseType: ResponseType.json,
         headers: {'Cache-Control': 'no-cache'},
+        receiveTimeout: const Duration(seconds: 20),
       ),
     );
 

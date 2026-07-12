@@ -1,20 +1,23 @@
 import 'package:dio/dio.dart';
 
-import '../../config/projects/moneytherapist_config.dart';
+import '../../config/project_config.dart';
 import 'campaign_lead_model.dart';
 import 'campaign_model.dart';
 import 'signal_model.dart';
 
 class SignalService {
   final Dio _dio;
+  final ApiEndpoints _apiEndpoints;
 
-  SignalService(this._dio);
+  SignalService(this._dio, ProjectConfig project)
+    : _apiEndpoints = project.apiEndpoints;
 
-  static final String _baseUrl = moneyTherapistConfig.apiEndpoints.baseUrl;
+  SignalService.withEndpoints(this._dio, {required ApiEndpoints apiEndpoints})
+    : _apiEndpoints = apiEndpoints;
 
   Future<List<SignalModel>> fetchSignalHistory() async {
     final response = await _dio.get(
-      '$_baseUrl/moneytherapist-signal-history',
+      _apiEndpoints.signalHistory,
       options: Options(headers: {'Accept': 'application/json'}),
     );
 
@@ -52,12 +55,11 @@ class SignalService {
     required int targetChatId,
     required String adminUsername,
 
-    // For MoneyTherapist admin check.
     // If UI does not pass it yet, default keeps current test admin working.
     int adminTelegramId = 7376947596,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-signal-send',
+      _apiEndpoints.signalSend,
       data: {
         'admin_telegram_id': adminTelegramId,
         'admin_username': adminUsername,
@@ -91,7 +93,7 @@ class SignalService {
 
   Future<List<CampaignModel>> fetchCampaigns() async {
     final response = await _dio.get(
-      '$_baseUrl/moneytherapist-campaign-list',
+      _apiEndpoints.campaignList,
       options: Options(headers: {'Accept': 'application/json'}),
     );
 
@@ -122,7 +124,7 @@ class SignalService {
     int offset = 0,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-campaign-leads',
+      _apiEndpoints.campaignLeads,
       data: {
         'campaign_id': campaignId,
         'status': status,
@@ -163,7 +165,7 @@ class SignalService {
     int adminTelegramId = 7376947596,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-campaign-create',
+      _apiEndpoints.campaignCreate,
       data: {
         'admin_telegram_id': adminTelegramId,
         'admin_username': createdByUsername,
@@ -193,7 +195,7 @@ class SignalService {
     required int campaignId,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-campaign-status',
+      _apiEndpoints.campaignStatus,
       data: {'campaign_id': campaignId},
       options: Options(
         headers: {
@@ -214,7 +216,7 @@ class SignalService {
 
   // NOTE:
   // This needs a separate backend API if you want real campaign status update.
-  // Current moneytherapist-campaign-status API only READS campaign stats.
+  // Current campaign status API only READS campaign stats.
   Future<void> updateCampaignStatus({
     required int campaignId,
     required String status,
@@ -222,7 +224,7 @@ class SignalService {
   }) async {
     throw UnimplementedError(
       'Campaign status update API is not created yet. '
-      'Create moneytherapist-campaign-update-status first.',
+      'Create a campaign status update endpoint first.',
     );
   }
 }

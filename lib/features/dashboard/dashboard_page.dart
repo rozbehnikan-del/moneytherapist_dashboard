@@ -1,10 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/dashboard_card.dart';
 import '../../app/app_form_styles.dart';
 import '../../config/project_config.dart';
-import '../../core/networking/dio_factory.dart';
 import 'dashboard_models.dart';
 import 'dashboard_service.dart';
 import 'widgets/action_card.dart';
@@ -18,8 +18,9 @@ import 'widgets/segment_card.dart';
 
 class DashboardPage extends StatefulWidget {
   final ProjectConfig project;
+  final Dio dio;
 
-  const DashboardPage({super.key, required this.project});
+  const DashboardPage({super.key, required this.project, required this.dio});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -32,10 +33,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _service = DashboardService(
-      DioFactory.create(widget.project),
-      widget.project,
-    );
+    _service = DashboardService(widget.dio, widget.project);
     _futureDashboard = _service.fetchDashboard();
   }
 

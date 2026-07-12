@@ -2,19 +2,21 @@
 
 import 'package:dio/dio.dart';
 
-import '../../config/projects/moneytherapist_config.dart';
+import '../../config/project_config.dart';
 import 'broadcast_audience_model.dart';
 import 'broadcast_model.dart';
 
 class BroadcastService {
   final Dio _dio;
+  final ApiEndpoints _apiEndpoints;
 
-  BroadcastService(this._dio);
+  BroadcastService(this._dio, ProjectConfig project)
+    : _apiEndpoints = project.apiEndpoints;
 
-  // Use /webhook-test while testing n8n manually.
-  // Change to /webhook after workflows are active/production.
-  static final String _baseUrl = moneyTherapistConfig.apiEndpoints.baseUrl;
-  static final String _testBaseUrl = '$_baseUrl-test';
+  BroadcastService.withEndpoints(
+    this._dio, {
+    required ApiEndpoints apiEndpoints,
+  }) : _apiEndpoints = apiEndpoints;
 
   Future<BroadcastAudiencePreview> previewAudience({
     int? campaignId,
@@ -22,7 +24,7 @@ class BroadcastService {
     int limit = 10,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-broadcast-audience-preview',
+      _apiEndpoints.broadcastAudiencePreview,
       data: {
         if (campaignId != null) 'campaign_id': campaignId,
         'target_segment': targetSegment,
@@ -54,7 +56,7 @@ class BroadcastService {
     int limit = 100,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-broadcast-create',
+      _apiEndpoints.broadcastCreate,
       data: {
         if (campaignId != null) 'campaign_id': campaignId,
         'title': title.trim(),
@@ -95,8 +97,8 @@ class BroadcastService {
   }) async {
     final response = await _postMediaUploadWithFallback(
       urls: [
-        '$_baseUrl/moneytherapist-media-upload',
-        '$_testBaseUrl/moneytherapist-media-upload',
+        _apiEndpoints.mediaUpload,
+        '${_apiEndpoints.baseUrl}-test${_apiEndpoints.mediaUpload}',
       ],
       messageType: messageType,
       fileName: fileName,
@@ -162,7 +164,7 @@ class BroadcastService {
 
     throw Exception(
       'Media upload failed before n8n returned a response. Check that the '
-      'moneytherapist-media-upload workflow is active or listening in test '
+      'media upload workflow is active or listening in test '
       'mode, and that the webhook returns CORS headers for errors.$reason',
     );
   }
@@ -182,7 +184,7 @@ class BroadcastService {
     int limit = 100,
   }) async {
     final response = await _dio.post(
-      '$_baseUrl/moneytherapist-broadcast-send',
+      _apiEndpoints.broadcastSend,
       data: {
         'broadcast_id': broadcastId,
         'admin_username': adminUsername.replaceAll('@', '').trim(),
@@ -201,7 +203,7 @@ class BroadcastService {
 
   Future<List<BroadcastModel>> fetchBroadcastHistory() async {
     final response = await _dio.get(
-      '$_baseUrl/moneytherapist-broadcast-history',
+      _apiEndpoints.broadcastHistory,
       options: _jsonOptions(),
     );
 
