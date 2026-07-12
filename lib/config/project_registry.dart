@@ -12,6 +12,12 @@ class ProjectRegistry {
 
   static ProjectConfig resolve(String projectId) {
     final normalized = projectId.trim().toLowerCase();
-    return _projects[normalized] ?? defaultProject;
+    final project = _projects[normalized];
+
+    if (project == null) {
+      throw UnsupportedError('Unknown PROJECT_ID: $projectId');
+    }
+
+    return project;
   }
 }

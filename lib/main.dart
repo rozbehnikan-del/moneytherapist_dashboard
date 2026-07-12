@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app/money_therapist_app.dart';
+import 'app/dashboard_app.dart';
 import 'config/project_registry.dart';
 import 'core/telegram/telegram_web_app.dart';
 

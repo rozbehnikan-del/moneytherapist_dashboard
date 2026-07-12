@@ -24,7 +24,7 @@ class _AdminGateState extends State<AdminGate> {
   @override
   void initState() {
     super.initState();
-    _service = AdminAccessService(Dio());
+    _service = AdminAccessService(Dio(), widget.project);
     _futureAccess = _service.checkAccess();
   }
 

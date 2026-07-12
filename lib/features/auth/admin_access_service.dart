@@ -1,36 +1,46 @@
 import 'package:dio/dio.dart';
 
+import '../../config/project_config.dart';
 import '../../core/telegram/telegram_web_app.dart';
 import 'admin_access_model.dart';
 
 class AdminAccessService {
   final Dio _dio;
+  final ApiEndpoints _apiEndpoints;
+  final AdminConfig _adminConfig;
 
-  AdminAccessService(this._dio);
+  AdminAccessService(
+    this._dio,
+    ProjectConfig project,
+  )   : _apiEndpoints = project.apiEndpoints,
+        _adminConfig = project.admin;
 
-  static const String _adminUrl =
-      'https://sizin8n.launchman.xyz/webhook/moneytherapist-admin-me';
+  AdminAccessService.withConfig(
+    this._dio, {
+    required ApiEndpoints apiEndpoints,
+    required AdminConfig adminConfig,
+  })  : _apiEndpoints = apiEndpoints,
+        _adminConfig = adminConfig;
 
   Future<AdminAccessModel> checkAccess() async {
     final telegram = TelegramWebApp.instance;
     final user = telegram.user;
 
-    if (_isLocalHost) {
-      return const AdminAccessModel(
+    if (_adminConfig.localDevelopmentBypassEnabled && _isLocalHost) {
+      return AdminAccessModel(
         allowed: true,
         id: 0,
-        telegramUserId: 7376947596,
-        telegramUsername: 'RadicalaAI',
+        telegramUserId: _adminConfig.ownerTelegramUserId,
+        telegramUsername: _adminConfig.ownerTelegramUsername,
         role: 'owner',
       );
     }
 
     final response = await _dio.post(
-      _adminUrl,
+      _apiEndpoints.adminMe,
       data: {
         'telegram_user_id': user?.id,
         'telegram_username': user?.username,
-        // 'telegram_username': user?.username ?? 'RadicalaAI',
         'init_data': telegram.initData,
       },
       options: Options(
@@ -70,7 +80,10 @@ class AdminAccessService {
 
   bool _isKnownOwner(TelegramUser? user) {
     final username = user?.username?.trim().toLowerCase();
-    return user?.id == 7376947596 || username == 'radicalaai';
+    final ownerUsername =
+        _adminConfig.ownerTelegramUsername.trim().toLowerCase();
+    return user?.id == _adminConfig.ownerTelegramUserId ||
+        username == ownerUsername;
   }
 
   bool get _isLocalHost {
