@@ -28,7 +28,8 @@ class DashboardData {
 
   factory DashboardData.fromJson(Map<String, dynamic> json) {
     return DashboardData(
-      timestamp: DateTime.tryParse(json['timestamp']?.toString() ?? '') ??
+      timestamp:
+          DateTime.tryParse(json['timestamp']?.toString() ?? '') ??
           DateTime.now(),
       project: DashboardProject.fromJson(_map(json['project'])),
       core: CoreKpis.fromJson(_map(json['core'])),
@@ -49,10 +50,7 @@ class DashboardProject {
   final String name;
   final String type;
 
-  const DashboardProject({
-    required this.name,
-    required this.type,
-  });
+  const DashboardProject({required this.name, required this.type});
 
   factory DashboardProject.fromJson(Map<String, dynamic> json) {
     return DashboardProject(
@@ -103,9 +101,7 @@ class CoreKpis {
 
   factory CoreKpis.fromJson(Map<String, dynamic> json) {
     return CoreKpis(
-      totalUsers: NumberParser.toInt(
-        json['total_users'] ?? json['totalUsers'],
-      ),
+      totalUsers: NumberParser.toInt(json['total_users'] ?? json['totalUsers']),
       verifiedDeposits: NumberParser.toInt(
         json['verified_deposits'] ?? json['verifiedDeposits'],
       ),
@@ -114,24 +110,12 @@ class CoreKpis {
         json['valid_emails'] ?? json['validEmails'],
       ),
       onboarded: NumberParser.toInt(json['onboarded']),
-      introSent: NumberParser.toInt(
-        json['intro_sent'] ?? json['introSent'],
-      ),
-      active7d: NumberParser.toInt(
-        json['active_7d'] ?? json['active7d'],
-      ),
-      active24h: NumberParser.toInt(
-        json['active_24h'] ?? json['active24h'],
-      ),
-      active14d: NumberParser.toInt(
-        json['active_14d'] ?? json['active14d'],
-      ),
-      active30d: NumberParser.toInt(
-        json['active_30d'] ?? json['active30d'],
-      ),
-      messages7d: NumberParser.toInt(
-        json['messages_7d'] ?? json['messages7d'],
-      ),
+      introSent: NumberParser.toInt(json['intro_sent'] ?? json['introSent']),
+      active7d: NumberParser.toInt(json['active_7d'] ?? json['active7d']),
+      active24h: NumberParser.toInt(json['active_24h'] ?? json['active24h']),
+      active14d: NumberParser.toInt(json['active_14d'] ?? json['active14d']),
+      active30d: NumberParser.toInt(json['active_30d'] ?? json['active30d']),
+      messages7d: NumberParser.toInt(json['messages_7d'] ?? json['messages7d']),
       telegramVerified: NumberParser.toInt(
         json['telegram_verified'] ?? json['telegramVerified'],
       ),
@@ -234,9 +218,7 @@ class FunnelData {
     return FunnelData(
       start: NumberParser.toInt(json['start']),
       onboarded: NumberParser.toInt(json['onboarded']),
-      introSent: NumberParser.toInt(
-        json['intro_sent'] ?? json['introSent'],
-      ),
+      introSent: NumberParser.toInt(json['intro_sent'] ?? json['introSent']),
       verified: NumberParser.toInt(json['verified']),
     );
   }

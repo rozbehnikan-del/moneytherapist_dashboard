@@ -8,10 +8,7 @@ import 'splash_page.dart';
 class DashboardApp extends StatelessWidget {
   final ProjectConfig project;
 
-  const DashboardApp({
-    super.key,
-    required this.project,
-  });
+  const DashboardApp({super.key, required this.project});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +26,7 @@ class DashboardApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildTheme({
-    required Brightness brightness,
-  }) {
+  ThemeData _buildTheme({required Brightness brightness}) {
     final isDark = brightness == Brightness.dark;
 
     final colorScheme = ColorScheme.fromSeed(
@@ -39,8 +34,9 @@ class DashboardApp extends StatelessWidget {
       brightness: brightness,
     );
 
-    final scaffoldBackground =
-        isDark ? project.darkBackgroundColor : const Color(0xFFF6F8FB);
+    final scaffoldBackground = isDark
+        ? project.darkBackgroundColor
+        : const Color(0xFFF6F8FB);
 
     final cardColor = isDark ? project.cardDarkColor : Colors.white;
 
@@ -80,14 +76,8 @@ class DashboardApp extends StatelessWidget {
           color: primaryText,
           fontWeight: FontWeight.w900,
         ),
-        titleLarge: TextStyle(
-          color: primaryText,
-          fontWeight: FontWeight.w800,
-        ),
-        titleMedium: TextStyle(
-          color: primaryText,
-          fontWeight: FontWeight.w700,
-        ),
+        titleLarge: TextStyle(color: primaryText, fontWeight: FontWeight.w800),
+        titleMedium: TextStyle(color: primaryText, fontWeight: FontWeight.w700),
         bodyLarge: TextStyle(color: primaryText),
         bodyMedium: TextStyle(color: secondaryText),
         bodySmall: TextStyle(color: secondaryText),
@@ -122,10 +112,7 @@ class DashboardApp extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: project.primaryColor,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: project.primaryColor, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -133,10 +120,7 @@ class DashboardApp extends StatelessWidget {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0xFFDC2626),
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
         ),
       ),
 
@@ -144,10 +128,12 @@ class DashboardApp extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: project.primaryColor,
           foregroundColor: Colors.white,
-          disabledBackgroundColor:
-              isDark ? const Color(0xFF334155) : const Color(0xFFD1D5DB),
-          disabledForegroundColor:
-              isDark ? Colors.white38 : const Color(0xFF6B7280),
+          disabledBackgroundColor: isDark
+              ? const Color(0xFF334155)
+              : const Color(0xFFD1D5DB),
+          disabledForegroundColor: isDark
+              ? Colors.white38
+              : const Color(0xFF6B7280),
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
@@ -157,8 +143,9 @@ class DashboardApp extends StatelessWidget {
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor:
-              isDark ? project.secondaryColor : project.primaryColor,
+          foregroundColor: isDark
+              ? project.secondaryColor
+              : project.primaryColor,
           side: BorderSide(
             color: isDark ? project.secondaryColor : project.primaryColor,
           ),
@@ -171,8 +158,9 @@ class DashboardApp extends StatelessWidget {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor:
-              isDark ? project.secondaryColor : project.primaryColor,
+          foregroundColor: isDark
+              ? project.secondaryColor
+              : project.primaryColor,
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
@@ -213,10 +201,7 @@ class DashboardApp extends StatelessWidget {
       ),
 
       dropdownMenuTheme: DropdownMenuThemeData(
-        textStyle: TextStyle(
-          color: primaryText,
-          fontWeight: FontWeight.w600,
-        ),
+        textStyle: TextStyle(color: primaryText, fontWeight: FontWeight.w600),
         menuStyle: MenuStyle(
           backgroundColor: WidgetStatePropertyAll(cardColor),
         ),
@@ -229,10 +214,7 @@ class DashboardApp extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.w900,
         ),
-        contentTextStyle: TextStyle(
-          color: secondaryText,
-          fontSize: 14,
-        ),
+        contentTextStyle: TextStyle(color: secondaryText, fontSize: 14),
       ),
     );
   }

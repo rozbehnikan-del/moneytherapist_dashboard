@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../config/projects/moneytherapist_config.dart';
 import 'campaign_lead_model.dart';
 import 'campaign_model.dart';
 import 'signal_model.dart';
@@ -9,16 +10,12 @@ class SignalService {
 
   SignalService(this._dio);
 
-  static const String _baseUrl = 'https://sizin8n.launchman.xyz/webhook';
+  static final String _baseUrl = moneyTherapistConfig.apiEndpoints.baseUrl;
 
   Future<List<SignalModel>> fetchSignalHistory() async {
     final response = await _dio.get(
       '$_baseUrl/moneytherapist-signal-history',
-      options: Options(
-        headers: {
-          'Accept': 'application/json',
-        },
-      ),
+      options: Options(headers: {'Accept': 'application/json'}),
     );
 
     final data = response.data;
@@ -95,11 +92,7 @@ class SignalService {
   Future<List<CampaignModel>> fetchCampaigns() async {
     final response = await _dio.get(
       '$_baseUrl/moneytherapist-campaign-list',
-      options: Options(
-        headers: {
-          'Accept': 'application/json',
-        },
-      ),
+      options: Options(headers: {'Accept': 'application/json'}),
     );
 
     final data = response.data;
@@ -201,9 +194,7 @@ class SignalService {
   }) async {
     final response = await _dio.post(
       '$_baseUrl/moneytherapist-campaign-status',
-      data: {
-        'campaign_id': campaignId,
-      },
+      data: {'campaign_id': campaignId},
       options: Options(
         headers: {
           'Accept': 'application/json',

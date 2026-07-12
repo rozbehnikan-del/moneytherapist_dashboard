@@ -1,10 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/dashboard_card.dart';
 import '../../app/app_form_styles.dart';
 import '../../config/project_config.dart';
+import '../../core/networking/dio_factory.dart';
 import 'dashboard_models.dart';
 import 'dashboard_service.dart';
 import 'widgets/action_card.dart';
@@ -19,10 +19,7 @@ import 'widgets/segment_card.dart';
 class DashboardPage extends StatefulWidget {
   final ProjectConfig project;
 
-  const DashboardPage({
-    super.key,
-    required this.project,
-  });
+  const DashboardPage({super.key, required this.project});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -35,7 +32,10 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    _service = DashboardService(Dio());
+    _service = DashboardService(
+      DioFactory.create(widget.project),
+      widget.project,
+    );
     _futureDashboard = _service.fetchDashboard();
   }
 
@@ -131,10 +131,7 @@ class _DashboardContent extends StatelessWidget {
   final DashboardData data;
   final ProjectConfig project;
 
-  const _DashboardContent({
-    required this.data,
-    required this.project,
-  });
+  const _DashboardContent({required this.data, required this.project});
 
   @override
   Widget build(BuildContext context) {
@@ -143,10 +140,7 @@ class _DashboardContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _DashboardHeader(
-          timestamp: data.timestamp,
-          project: project,
-        ),
+        _DashboardHeader(timestamp: data.timestamp, project: project),
 
         const SizedBox(height: 24),
 
@@ -217,10 +211,7 @@ class _DashboardContent extends StatelessWidget {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 6,
-                    child: FunnelCard(funnel: data.funnel),
-                  ),
+                  Expanded(flex: 6, child: FunnelCard(funnel: data.funnel)),
                   const SizedBox(width: 16),
                   Expanded(
                     flex: 5,
@@ -260,30 +251,15 @@ class _DashboardContent extends StatelessWidget {
         _Panel(
           child: Column(
             children: [
-              MetricBar(
-                label: 'Engagement 7d',
-                value: data.rates.engagement7d,
-              ),
-              MetricBar(
-                label: 'Conversion',
-                value: data.rates.conversion,
-              ),
-              MetricBar(
-                label: 'Email Completion',
-                value: data.rates.email,
-              ),
+              MetricBar(label: 'Engagement 7d', value: data.rates.engagement7d),
+              MetricBar(label: 'Conversion', value: data.rates.conversion),
+              MetricBar(label: 'Email Completion', value: data.rates.email),
               MetricBar(
                 label: 'Qualified ≥300',
                 value: data.rates.qualified300,
               ),
-              MetricBar(
-                label: 'Retention W1',
-                value: data.rates.retentionW1,
-              ),
-              MetricBar(
-                label: 'Retention M1',
-                value: data.rates.retentionM1,
-              ),
+              MetricBar(label: 'Retention W1', value: data.rates.retentionW1),
+              MetricBar(label: 'Retention M1', value: data.rates.retentionM1),
             ],
           ),
         ),
@@ -298,13 +274,9 @@ class _DashboardContent extends StatelessWidget {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: ValueCard(value: data.value),
-                  ),
+                  Expanded(child: ValueCard(value: data.value)),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: SegmentCard(segments: data.segments),
-                  ),
+                  Expanded(child: SegmentCard(segments: data.segments)),
                 ],
               );
             }
@@ -327,10 +299,7 @@ class _DashboardHeader extends StatelessWidget {
   final DateTime timestamp;
   final ProjectConfig project;
 
-  const _DashboardHeader({
-    required this.timestamp,
-    required this.project,
-  });
+  const _DashboardHeader({required this.timestamp, required this.project});
 
   @override
   Widget build(BuildContext context) {
@@ -402,10 +371,7 @@ class _SectionTitle extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _SectionTitle({
-    required this.title,
-    required this.subtitle,
-  });
+  const _SectionTitle({required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -438,9 +404,7 @@ class _SectionTitle extends StatelessWidget {
 class _Panel extends StatelessWidget {
   final Widget child;
 
-  const _Panel({
-    required this.child,
-  });
+  const _Panel({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -450,13 +414,11 @@ class _Panel extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.04,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.04,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),

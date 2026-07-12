@@ -69,10 +69,7 @@ class _SignalsPageState extends State<SignalsPage> {
       }
     });
 
-    final futures = <Future>[
-      _futureSignals,
-      _futureCampaigns,
-    ];
+    final futures = <Future>[_futureSignals, _futureCampaigns];
 
     if (_futureCampaignLeads != null) {
       futures.add(_futureCampaignLeads!);
@@ -234,8 +231,10 @@ class _SignalsPageState extends State<SignalsPage> {
             final visibleSignals = _selectedCampaignId == null
                 ? signals
                 : signals
-                    .where((signal) => signal.campaignId == _selectedCampaignId)
-                    .toList();
+                      .where(
+                        (signal) => signal.campaignId == _selectedCampaignId,
+                      )
+                      .toList();
 
             return RefreshIndicator(
               onRefresh: _refresh,
@@ -258,7 +257,7 @@ class _SignalsPageState extends State<SignalsPage> {
                       final campaigns = campaignSnapshot.data ?? [];
                       final isLoadingCampaigns =
                           campaignSnapshot.connectionState ==
-                              ConnectionState.waiting;
+                          ConnectionState.waiting;
 
                       return _CreateSignalCard(
                         isLoadingCampaigns: isLoadingCampaigns,
@@ -266,10 +265,7 @@ class _SignalsPageState extends State<SignalsPage> {
                         canManage: _canManage,
                         onPressed: isLoadingCampaigns || !_canManage
                             ? null
-                            : () => _openCreateSignalSheet(
-                                  context,
-                                  campaigns,
-                                ),
+                            : () => _openCreateSignalSheet(context, campaigns),
                       );
                     },
                   ),
@@ -298,7 +294,7 @@ class _SignalsPageState extends State<SignalsPage> {
                       },
                     ),
                   ],
-                  
+
                   const SizedBox(height: 24),
 
                   FutureBuilder<List<CampaignModel>>(
@@ -352,7 +348,8 @@ class _SignalsPageState extends State<SignalsPage> {
                       builder: (context, leadSnapshot) {
                         return CampaignLeadList(
                           leads: leadSnapshot.data ?? [],
-                          isLoading: leadSnapshot.connectionState ==
+                          isLoading:
+                              leadSnapshot.connectionState ==
                               ConnectionState.waiting,
                           error: leadSnapshot.error,
                           onRetry: () {
@@ -415,15 +412,13 @@ class _SignalsHeader extends StatelessWidget {
   final String? adminUsername;
   final String? adminRole;
 
-  const _SignalsHeader({
-    required this.adminUsername,
-    required this.adminRole,
-  });
+  const _SignalsHeader({required this.adminUsername, required this.adminRole});
 
   @override
   Widget build(BuildContext context) {
-    final username =
-        adminUsername?.trim().isNotEmpty == true ? adminUsername! : 'Admin';
+    final username = adminUsername?.trim().isNotEmpty == true
+        ? adminUsername!
+        : 'Admin';
 
     final role = adminRole?.trim().isNotEmpty == true ? adminRole! : 'admin';
 
@@ -535,7 +530,9 @@ class _CreateSignalCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(appIsDarkMode(context) ? 0.18 : 0.08),
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.08,
+            ),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -570,8 +567,8 @@ class _CreateSignalCard extends StatelessWidget {
                       isLoadingCampaigns
                           ? 'Loading campaigns...'
                           : canManage
-                              ? 'New Signal'
-                              : 'Read-only access',
+                          ? 'New Signal'
+                          : 'Read-only access',
                     ),
                   ),
                 ),
@@ -602,8 +599,8 @@ class _CreateSignalCard extends StatelessWidget {
                   isLoadingCampaigns
                       ? 'Loading...'
                       : canManage
-                          ? 'New'
-                          : 'Read-only',
+                      ? 'New'
+                      : 'Read-only',
                 ),
               ),
             ],
@@ -630,10 +627,10 @@ class _CreateSignalText extends StatelessWidget {
     final subtitle = !canManage
         ? 'You can view analytics and history, but cannot send signals or manage campaigns.'
         : isLoadingCampaigns
-            ? 'Loading active campaigns...'
-            : campaignCount > 0
-                ? '$campaignCount campaign available. Prepare and send a new signal.'
-                : 'No campaign found. Create a campaign before sending signals.';
+        ? 'Loading active campaigns...'
+        : campaignCount > 0
+        ? '$campaignCount campaign available. Prepare and send a new signal.'
+        : 'No campaign found. Create a campaign before sending signals.';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -771,16 +768,18 @@ class _SelectedCampaignSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final totalSignals = signals.length;
-    final sentSignals =
-        signals.where((s) => s.status.toLowerCase() == 'sent').length;
-    final failedSignals =
-        signals.where((s) => s.status.toLowerCase() == 'failed').length;
+    final sentSignals = signals
+        .where((s) => s.status.toLowerCase() == 'sent')
+        .length;
+    final failedSignals = signals
+        .where((s) => s.status.toLowerCase() == 'failed')
+        .length;
 
     final recommendation = campaign.newLeads == 0
         ? 'No leads are attached to this campaign yet. Connect users/leads to this campaign to measure real impact.'
         : campaign.newDeposits == 0
-            ? 'Leads are coming in, but no deposits yet. Follow up with these users or improve the campaign CTA.'
-            : 'Campaign is generating deposits. Keep tracking quality, conversion rate, and deposit value.';
+        ? 'Leads are coming in, but no deposits yet. Follow up with these users or improve the campaign CTA.'
+        : 'Campaign is generating deposits. Keep tracking quality, conversion rate, and deposit value.';
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -792,7 +791,9 @@ class _SelectedCampaignSummary extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(appIsDarkMode(context) ? 0.18 : 0.06),
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.06,
+            ),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -885,22 +886,13 @@ class _SelectedCampaignSummary extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _DarkMetric(
-                  label: 'Signals',
-                  value: '$totalSignals',
-                ),
+                child: _DarkMetric(label: 'Signals', value: '$totalSignals'),
               ),
               Expanded(
-                child: _DarkMetric(
-                  label: 'Sent',
-                  value: '$sentSignals',
-                ),
+                child: _DarkMetric(label: 'Sent', value: '$sentSignals'),
               ),
               Expanded(
-                child: _DarkMetric(
-                  label: 'Failed',
-                  value: '$failedSignals',
-                ),
+                child: _DarkMetric(label: 'Failed', value: '$failedSignals'),
               ),
             ],
           ),
@@ -909,7 +901,7 @@ class _SelectedCampaignSummary extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
+              color: Colors.white.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white12),
             ),
@@ -1030,10 +1022,7 @@ class _DarkMetric extends StatelessWidget {
   final String label;
   final String value;
 
-  const _DarkMetric({
-    required this.label,
-    required this.value,
-  });
+  const _DarkMetric({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -1067,9 +1056,7 @@ class _DarkMetric extends StatelessWidget {
 class _DarkStatusPill extends StatelessWidget {
   final String status;
 
-  const _DarkStatusPill({
-    required this.status,
-  });
+  const _DarkStatusPill({required this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -1078,15 +1065,15 @@ class _DarkStatusPill extends StatelessWidget {
     final color = normalized == 'active'
         ? const Color(0xFF22C55E)
         : normalized == 'paused'
-            ? const Color(0xFFFACC15)
-            : const Color(0xFFCBD5E1);
+        ? const Color(0xFFFACC15)
+        : const Color(0xFFCBD5E1);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.14),
+        color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withOpacity(0.28)),
+        border: Border.all(color: color.withValues(alpha: 0.28)),
       ),
       child: Text(
         status.toUpperCase(),
@@ -1112,13 +1099,9 @@ class _CampaignLoadingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 }
@@ -1126,16 +1109,15 @@ class _CampaignLoadingCard extends StatelessWidget {
 class _SignalStatsRow extends StatelessWidget {
   final List<SignalModel> signals;
 
-  const _SignalStatsRow({
-    required this.signals,
-  });
+  const _SignalStatsRow({required this.signals});
 
   @override
   Widget build(BuildContext context) {
     final total = signals.length;
     final sent = signals.where((s) => s.status.toLowerCase() == 'sent').length;
-    final failed =
-        signals.where((s) => s.status.toLowerCase() == 'failed').length;
+    final failed = signals
+        .where((s) => s.status.toLowerCase() == 'failed')
+        .length;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1201,12 +1183,12 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(appIsDarkMode(context) ? 0.18 : 0.035),
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.035,
+            ),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -1214,10 +1196,7 @@ class _StatCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: const Color(0xFF2563EB),
-          ),
+          Icon(icon, color: const Color(0xFF2563EB)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -1247,10 +1226,7 @@ class _StatCard extends StatelessWidget {
 class SignalHistoryCard extends StatelessWidget {
   final SignalModel signal;
 
-  const SignalHistoryCard({
-    super.key,
-    required this.signal,
-  });
+  const SignalHistoryCard({super.key, required this.signal});
 
   @override
   Widget build(BuildContext context) {
@@ -1265,12 +1241,12 @@ class SignalHistoryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(appIsDarkMode(context) ? 0.18 : 0.035),
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.035,
+            ),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -1365,10 +1341,7 @@ class _SignalTopRow extends StatelessWidget {
   final SignalModel signal;
   final String sentAt;
 
-  const _SignalTopRow({
-    required this.signal,
-    required this.sentAt,
-  });
+  const _SignalTopRow({required this.signal, required this.sentAt});
 
   @override
   Widget build(BuildContext context) {
@@ -1482,9 +1455,7 @@ class _RiskPill extends StatelessWidget {
 class _SignalHistorySection extends StatelessWidget {
   final List<SignalModel> signals;
 
-  const _SignalHistorySection({
-    required this.signals,
-  });
+  const _SignalHistorySection({required this.signals});
 
   @override
   Widget build(BuildContext context) {
@@ -1498,13 +1469,11 @@ class _SignalHistorySection extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.035,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.035,
             ),
             blurRadius: 14,
             offset: const Offset(0, 6),
@@ -1517,9 +1486,7 @@ class _SignalHistorySection extends StatelessWidget {
           physics: const ClampingScrollPhysics(),
           itemCount: signals.length,
           itemBuilder: (context, index) {
-            return SignalHistoryCard(
-              signal: signals[index],
-            );
+            return SignalHistoryCard(signal: signals[index]);
           },
         ),
       ),
@@ -1531,10 +1498,7 @@ class _MetricChip extends StatelessWidget {
   final String label;
   final double? value;
 
-  const _MetricChip({
-    required this.label,
-    required this.value,
-  });
+  const _MetricChip({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -1551,9 +1515,7 @@ class _MetricChip extends StatelessWidget {
             ? const Color(0xFF0F172A)
             : const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Text(
         '$label: $display',
@@ -1580,9 +1542,7 @@ class _EmptySignals extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Text(
         'No signals found for this filter.',

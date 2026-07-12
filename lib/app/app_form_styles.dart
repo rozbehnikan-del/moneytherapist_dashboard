@@ -59,10 +59,7 @@ InputDecoration appInputDecoration(
       fontSize: 14,
       fontWeight: FontWeight.w800,
     ),
-    contentPadding: const EdgeInsets.symmetric(
-      horizontal: 18,
-      vertical: 18,
-    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
       borderSide: BorderSide(
@@ -84,16 +81,11 @@ InputDecoration appInputDecoration(
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(
-        color: Color(0xFFDC2626),
-      ),
+      borderSide: const BorderSide(color: Color(0xFFDC2626)),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
-      borderSide: const BorderSide(
-        color: Color(0xFFDC2626),
-        width: 1.5,
-      ),
+      borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
     ),
     disabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
@@ -146,22 +138,22 @@ Color appPremiumAccentColor(BuildContext context) {
 
 Color appAccentSoftColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return Theme.of(context).colorScheme.primary.withValues(
-        alpha: dark ? 0.24 : 0.12,
-      );
+  return Theme.of(
+    context,
+  ).colorScheme.primary.withValues(alpha: dark ? 0.24 : 0.12);
 }
 
 Color appPremiumSoftColor(BuildContext context) {
   final dark = appIsDarkMode(context);
-  return Theme.of(context).colorScheme.secondary.withValues(
-        alpha: dark ? 0.22 : 0.14,
-      );
+  return Theme.of(
+    context,
+  ).colorScheme.secondary.withValues(alpha: dark ? 0.22 : 0.14);
 }
 
 Color appAccentTextColor(BuildContext context) {
   final dark = appIsDarkMode(context);
   return dark
       ? Theme.of(context).iconTheme.color ??
-          Theme.of(context).colorScheme.primary
+            Theme.of(context).colorScheme.primary
       : Theme.of(context).colorScheme.primary;
 }

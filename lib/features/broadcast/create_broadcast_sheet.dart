@@ -55,12 +55,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
   BroadcastAudiencePreview? _preview;
   BroadcastModel? _createdBroadcast;
 
-  static const List<String> _messageTypes = [
-    'text',
-    'photo',
-    'video',
-    'voice',
-  ];
+  static const List<String> _messageTypes = ['text', 'photo', 'video', 'voice'];
 
   static const List<String> _targetSegments = [
     'all_users',
@@ -210,8 +205,9 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
         createdByTelegramId: widget.adminTelegramUserId,
         mediaUrl: _cleanOptional(_mediaUrlController.text),
         mediaFileId: _cleanOptional(_mediaFileIdController.text),
-        mediaCaption:
-            _requiresMedia ? _cleanOptional(_messageController.text) : null,
+        mediaCaption: _requiresMedia
+            ? _cleanOptional(_messageController.text)
+            : null,
         sendMode: _scheduleForLater ? 'scheduled' : 'now',
         scheduledAt: _scheduleForLater ? _scheduledDateTime : null,
         limit: _preview!.totalRecipients,
@@ -565,7 +561,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _messageType,
+                        initialValue: _messageType,
                         style: appFieldTextStyle(context),
                         dropdownColor: appCardBackgroundColor(context),
                         iconEnabledColor: appSecondaryTextColor(context),
@@ -603,7 +599,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _targetSegment,
+                        initialValue: _targetSegment,
                         style: appFieldTextStyle(context),
                         dropdownColor: appCardBackgroundColor(context),
                         iconEnabledColor: appSecondaryTextColor(context),
@@ -635,7 +631,7 @@ class _CreateBroadcastSheetState extends State<CreateBroadcastSheet> {
                       if (widget.campaigns.isNotEmpty) ...[
                         const SizedBox(height: 14),
                         DropdownButtonFormField<int?>(
-                          value: _campaignId,
+                          initialValue: _campaignId,
                           style: appFieldTextStyle(context),
                           dropdownColor: appCardBackgroundColor(context),
                           iconEnabledColor: appSecondaryTextColor(context),
@@ -874,7 +870,7 @@ class _ScheduleCard extends StatelessWidget {
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
             value: scheduleForLater,
-            activeColor: const Color(0xFF2563EB),
+            activeThumbColor: const Color(0xFF2563EB),
             onChanged: onToggle,
             title: Text(
               'Schedule for later',
@@ -965,10 +961,10 @@ class _MediaAttachmentCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2563EB).withOpacity(0.12),
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFF2563EB).withOpacity(0.35),
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.35),
                   ),
                 ),
                 child: const Icon(
@@ -1030,9 +1026,7 @@ class _MediaAttachmentCard extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onStopVoiceRecording,
                     icon: const Icon(Icons.stop_rounded),
-                    label: Text(
-                      isRecordingVoice ? 'Stop & Upload' : 'Stop',
-                    ),
+                    label: Text(isRecordingVoice ? 'Stop & Upload' : 'Stop'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(double.infinity, 46),
                     ),
@@ -1077,10 +1071,7 @@ class _MediaAttachmentCard extends StatelessWidget {
             focusNode: mediaFileIdFocusNode,
             style: appFieldTextStyle(context),
             cursorColor: const Color(0xFF2563EB),
-            decoration: appInputDecoration(
-              context,
-              label: 'Telegram file_id',
-            ),
+            decoration: appInputDecoration(context, label: 'Telegram file_id'),
             validator: (_) {
               if (!hasMedia) {
                 return '$label needs a media URL or Telegram file_id';
@@ -1095,10 +1086,7 @@ class _MediaAttachmentCard extends StatelessWidget {
             focusNode: mediaUrlFocusNode,
             style: appFieldTextStyle(context),
             cursorColor: const Color(0xFF2563EB),
-            decoration: appInputDecoration(
-              context,
-              label: 'Media URL',
-            ),
+            decoration: appInputDecoration(context, label: 'Media URL'),
             validator: (value) {
               final url = value?.trim() ?? '';
               if (url.isNotEmpty &&
@@ -1208,10 +1196,7 @@ class _MessagePreviewCard extends StatelessWidget {
             children: [
               _DarkChip(label: messageType),
               _DarkChip(label: targetSegment),
-              if (!isText)
-                _DarkChip(
-                  label: cleanMedia == null ? 'media required' : cleanMedia,
-                ),
+              if (!isText) _DarkChip(label: cleanMedia ?? 'media required'),
               if (isScheduled)
                 _DarkChip(
                   label: scheduledDateTime == null
@@ -1224,8 +1209,8 @@ class _MessagePreviewCard extends StatelessWidget {
           Text(
             messageText.trim().isEmpty
                 ? isText
-                    ? 'Message text will appear here.'
-                    : 'Caption is optional.'
+                      ? 'Message text will appear here.'
+                      : 'Caption is optional.'
                 : messageText,
             style: const TextStyle(
               color: Colors.white70,
@@ -1239,7 +1224,7 @@ class _MessagePreviewCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.10),
+                color: Colors.white.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white12),
               ),
@@ -1468,7 +1453,7 @@ class _DarkChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.10),
+        color: Colors.white.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white12),
       ),

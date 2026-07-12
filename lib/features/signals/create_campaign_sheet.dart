@@ -13,7 +13,8 @@ class CreateCampaignSheet extends StatefulWidget {
     required String status,
     required String targetSegment,
     required String createdByUsername,
-  }) onSubmit;
+  })
+  onSubmit;
 
   const CreateCampaignSheet({
     super.key,
@@ -120,9 +121,7 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: appSheetBackgroundColor(context),
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(28),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Form(
             key: _formKey,
@@ -167,10 +166,7 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
 
                 const SizedBox(height: 20),
 
-                _TextInput(
-                  controller: _nameController,
-                  label: 'Campaign Name',
-                ),
+                _TextInput(controller: _nameController, label: 'Campaign Name'),
 
                 _TextInput(
                   controller: _descriptionController,
@@ -231,28 +227,19 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                 const SizedBox(height: 10),
 
                 DropdownButtonFormField<String>(
-                  value: _status,
+                  initialValue: _status,
                   style: appFieldTextStyle(context),
                   dropdownColor: appCardBackgroundColor(context),
                   iconEnabledColor: appSecondaryTextColor(context),
-                  decoration: appInputDecoration(
-                    context,
-                    label: 'Status',
-                  ),
+                  decoration: appInputDecoration(context, label: 'Status'),
                   items: [
                     DropdownMenuItem(
                       value: 'active',
-                      child: Text(
-                        'Active',
-                        style: appFieldTextStyle(context),
-                      ),
+                      child: Text('Active', style: appFieldTextStyle(context)),
                     ),
                     DropdownMenuItem(
                       value: 'paused',
-                      child: Text(
-                        'Paused',
-                        style: appFieldTextStyle(context),
-                      ),
+                      child: Text('Paused', style: appFieldTextStyle(context)),
                     ),
                     DropdownMenuItem(
                       value: 'completed',
@@ -294,9 +281,7 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.add_rounded),
-                  label: Text(
-                    _isSaving ? 'Creating...' : 'Create Campaign',
-                  ),
+                  label: Text(_isSaving ? 'Creating...' : 'Create Campaign'),
                   style: FilledButton.styleFrom(
                     minimumSize: const Size(double.infinity, 52),
                   ),
@@ -332,11 +317,7 @@ class _TextInput extends StatelessWidget {
         maxLines: maxLines,
         style: appFieldTextStyle(context),
         cursorColor: const Color(0xFF2563EB),
-        decoration: appInputDecoration(
-          context,
-          label: label,
-          hint: hint,
-        ),
+        decoration: appInputDecoration(context, label: label, hint: hint),
         validator: (value) {
           final text = value?.trim() ?? '';
 
@@ -430,7 +411,9 @@ class _CampaignPreviewCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               _PreviewChip(label: status),
-              _PreviewChip(label: targetSegment.isEmpty ? 'segment' : targetSegment),
+              _PreviewChip(
+                label: targetSegment.isEmpty ? 'segment' : targetSegment,
+              ),
               _PreviewChip(label: startDate.isEmpty ? 'start date' : startDate),
               _PreviewChip(label: endDate.isEmpty ? 'end date' : endDate),
             ],
@@ -444,19 +427,14 @@ class _CampaignPreviewCard extends StatelessWidget {
 class _PreviewChip extends StatelessWidget {
   final String label;
 
-  const _PreviewChip({
-    required this.label,
-  });
+  const _PreviewChip({required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.10),
+        color: Colors.white.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white12),
       ),

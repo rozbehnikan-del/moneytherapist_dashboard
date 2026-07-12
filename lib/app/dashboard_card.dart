@@ -30,13 +30,11 @@ class DashboardCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.04,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.04,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),
@@ -76,10 +74,7 @@ class DashboardCard extends StatelessWidget {
       return content;
     }
 
-    return SizedBox(
-      height: height,
-      child: content,
-    );
+    return SizedBox(height: height, child: content);
   }
 }
 
@@ -97,8 +92,9 @@ class _DashboardCardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment:
-          subtitle == null ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: subtitle == null
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
@@ -128,10 +124,7 @@ class _DashboardCardHeader extends StatelessWidget {
             ],
           ),
         ),
-        if (trailing != null) ...[
-          const SizedBox(width: 12),
-          trailing!,
-        ],
+        if (trailing != null) ...[const SizedBox(width: 12), trailing!],
       ],
     );
   }

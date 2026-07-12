@@ -41,7 +41,7 @@ class CampaignCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(dark ? 0.18 : 0.035),
+              color: Colors.black.withValues(alpha: dark ? 0.18 : 0.035),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),
@@ -125,11 +125,10 @@ class CampaignCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: signalRate.clamp(0.0, 1.0),
                 minHeight: 8,
-                backgroundColor:
-                    dark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
-                valueColor: const AlwaysStoppedAnimation(
-                  Color(0xFF2563EB),
-                ),
+                backgroundColor: dark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFE5E7EB),
+                valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
               ),
             ),
 
@@ -169,10 +168,7 @@ class _MiniMetric extends StatelessWidget {
   final String label;
   final String value;
 
-  const _MiniMetric({
-    required this.label,
-    required this.value,
-  });
+  const _MiniMetric({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -209,9 +205,7 @@ class _MiniMetric extends StatelessWidget {
 class _StatusPill extends StatelessWidget {
   final String status;
 
-  const _StatusPill({
-    required this.status,
-  });
+  const _StatusPill({required this.status});
 
   @override
   Widget build(BuildContext context) {

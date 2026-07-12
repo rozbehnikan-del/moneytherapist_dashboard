@@ -9,18 +9,16 @@ class AdminAccessService {
   final ApiEndpoints _apiEndpoints;
   final AdminConfig _adminConfig;
 
-  AdminAccessService(
-    this._dio,
-    ProjectConfig project,
-  )   : _apiEndpoints = project.apiEndpoints,
-        _adminConfig = project.admin;
+  AdminAccessService(this._dio, ProjectConfig project)
+    : _apiEndpoints = project.apiEndpoints,
+      _adminConfig = project.admin;
 
   AdminAccessService.withConfig(
     this._dio, {
     required ApiEndpoints apiEndpoints,
     required AdminConfig adminConfig,
-  })  : _apiEndpoints = apiEndpoints,
-        _adminConfig = adminConfig;
+  }) : _apiEndpoints = apiEndpoints,
+       _adminConfig = adminConfig;
 
   Future<AdminAccessModel> checkAccess() async {
     final telegram = TelegramWebApp.instance;
@@ -43,14 +41,6 @@ class AdminAccessService {
         'telegram_username': user?.username,
         'init_data': telegram.initData,
       },
-      options: Options(
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        sendTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
     );
 
     final data = response.data;
@@ -80,8 +70,9 @@ class AdminAccessService {
 
   bool _isKnownOwner(TelegramUser? user) {
     final username = user?.username?.trim().toLowerCase();
-    final ownerUsername =
-        _adminConfig.ownerTelegramUsername.trim().toLowerCase();
+    final ownerUsername = _adminConfig.ownerTelegramUsername
+        .trim()
+        .toLowerCase();
     return user?.id == _adminConfig.ownerTelegramUserId ||
         username == ownerUsername;
   }

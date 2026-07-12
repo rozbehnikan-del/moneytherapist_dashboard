@@ -7,40 +7,19 @@ import '../dashboard_models.dart';
 class DashboardSummaryChart extends StatelessWidget {
   final DashboardData data;
 
-  const DashboardSummaryChart({
-    super.key,
-    required this.data,
-  });
+  const DashboardSummaryChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     final dark = appIsDarkMode(context);
 
     final chartItems = [
-      _ChartItem(
-        label: 'Users',
-        value: data.core.totalUsers.toDouble(),
-      ),
-      _ChartItem(
-        label: 'Started',
-        value: data.funnel.start.toDouble(),
-      ),
-      _ChartItem(
-        label: 'Onboarded',
-        value: data.funnel.onboarded.toDouble(),
-      ),
-      _ChartItem(
-        label: 'Intro',
-        value: data.funnel.introSent.toDouble(),
-      ),
-      _ChartItem(
-        label: 'Verified',
-        value: data.funnel.verified.toDouble(),
-      ),
-      _ChartItem(
-        label: 'Messages',
-        value: data.core.messages7d.toDouble(),
-      ),
+      _ChartItem(label: 'Users', value: data.core.totalUsers.toDouble()),
+      _ChartItem(label: 'Started', value: data.funnel.start.toDouble()),
+      _ChartItem(label: 'Onboarded', value: data.funnel.onboarded.toDouble()),
+      _ChartItem(label: 'Intro', value: data.funnel.introSent.toDouble()),
+      _ChartItem(label: 'Verified', value: data.funnel.verified.toDouble()),
+      _ChartItem(label: 'Messages', value: data.core.messages7d.toDouble()),
     ];
 
     final maxValue = chartItems.fold<double>(
@@ -146,8 +125,9 @@ class DashboardSummaryChart extends StatelessWidget {
                 backDrawRodData: BackgroundBarChartRodData(
                   show: true,
                   toY: maxValue <= 0 ? 10 : maxValue * 1.25,
-                  color:
-                      dark ? const Color(0xFF1F2937) : const Color(0xFFEFF6FF),
+                  color: dark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFEFF6FF),
                 ),
               ),
             ],
@@ -183,8 +163,5 @@ class _ChartItem {
   final String label;
   final double value;
 
-  const _ChartItem({
-    required this.label,
-    required this.value,
-  });
+  const _ChartItem({required this.label, required this.value});
 }

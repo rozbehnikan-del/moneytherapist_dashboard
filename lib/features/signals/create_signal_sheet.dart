@@ -20,7 +20,8 @@ class CreateSignalSheet extends StatefulWidget {
     required String messageText,
     required int targetChatId,
     required String adminUsername,
-  }) onSubmit;
+  })
+  onSubmit;
 
   const CreateSignalSheet({
     super.key,
@@ -189,9 +190,7 @@ This is a test signal.
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: appSheetBackgroundColor(context),
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(28),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Form(
             key: _formKey,
@@ -241,15 +240,12 @@ This is a test signal.
                 const SizedBox(height: 10),
 
                 DropdownButtonFormField<int>(
-                  value: _selectedCampaignId,
+                  initialValue: _selectedCampaignId,
                   isExpanded: true,
                   style: appFieldTextStyle(context),
                   dropdownColor: appCardBackgroundColor(context),
                   iconEnabledColor: appSecondaryTextColor(context),
-                  decoration: appInputDecoration(
-                    context,
-                    label: 'Campaign',
-                  ),
+                  decoration: appInputDecoration(context, label: 'Campaign'),
                   items: widget.campaigns.map((campaign) {
                     return DropdownMenuItem<int>(
                       value: campaign.id,
@@ -286,10 +282,7 @@ This is a test signal.
 
                 const SizedBox(height: 10),
 
-                _TextInput(
-                  controller: _titleController,
-                  label: 'Signal Title',
-                ),
+                _TextInput(controller: _titleController, label: 'Signal Title'),
 
                 _TextInput(
                   controller: _signalTypeController,
@@ -409,35 +402,23 @@ This is a test signal.
                 const SizedBox(height: 10),
 
                 DropdownButtonFormField<String>(
-                  value: _riskLevel,
+                  initialValue: _riskLevel,
                   style: appFieldTextStyle(context),
                   dropdownColor: appCardBackgroundColor(context),
                   iconEnabledColor: appSecondaryTextColor(context),
-                  decoration: appInputDecoration(
-                    context,
-                    label: 'Risk Level',
-                  ),
+                  decoration: appInputDecoration(context, label: 'Risk Level'),
                   items: [
                     DropdownMenuItem(
                       value: 'low',
-                      child: Text(
-                        'Low',
-                        style: appFieldTextStyle(context),
-                      ),
+                      child: Text('Low', style: appFieldTextStyle(context)),
                     ),
                     DropdownMenuItem(
                       value: 'medium',
-                      child: Text(
-                        'Medium',
-                        style: appFieldTextStyle(context),
-                      ),
+                      child: Text('Medium', style: appFieldTextStyle(context)),
                     ),
                     DropdownMenuItem(
                       value: 'high',
-                      child: Text(
-                        'High',
-                        style: appFieldTextStyle(context),
-                      ),
+                      child: Text('High', style: appFieldTextStyle(context)),
                     ),
                   ],
                   onChanged: _isSending
@@ -528,9 +509,7 @@ This is a test signal.
 class _CampaignInfoCard extends StatelessWidget {
   final CampaignModel campaign;
 
-  const _CampaignInfoCard({
-    required this.campaign,
-  });
+  const _CampaignInfoCard({required this.campaign});
 
   @override
   Widget build(BuildContext context) {
@@ -539,16 +518,11 @@ class _CampaignInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.folder_rounded,
-            color: Color(0xFF2563EB),
-          ),
+          const Icon(Icons.folder_rounded, color: Color(0xFF2563EB)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -604,10 +578,7 @@ class _TextInput extends StatelessWidget {
         keyboardType: keyboardType,
         style: appFieldTextStyle(context),
         cursorColor: const Color(0xFF2563EB),
-        decoration: appInputDecoration(
-          context,
-          label: label,
-        ),
+        decoration: appInputDecoration(context, label: label),
         validator: (value) {
           final text = value?.trim() ?? '';
 

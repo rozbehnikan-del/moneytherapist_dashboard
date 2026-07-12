@@ -74,9 +74,7 @@ class _MainShellPageState extends State<MainShellPage> {
                 adminRole: widget.adminRole,
                 project: widget.project,
               ),
-            Expanded(
-              child: _tabs[_selectedIndex].page,
-            ),
+            Expanded(child: _tabs[_selectedIndex].page),
           ],
         ),
       ),
@@ -129,8 +127,9 @@ class _SideNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final username =
-        adminUsername?.trim().isNotEmpty == true ? adminUsername! : 'Admin';
+    final username = adminUsername?.trim().isNotEmpty == true
+        ? adminUsername!
+        : 'Admin';
 
     final role = adminRole?.trim().isNotEmpty == true ? adminRole! : 'admin';
 
@@ -141,20 +140,12 @@ class _SideNavigation extends StatelessWidget {
         color: appIsDarkMode(context)
             ? project.cardDarkColor
             : appCardBackgroundColor(context),
-        border: Border(
-          right: BorderSide(
-            color: appBorderColor(context),
-          ),
-        ),
+        border: Border(right: BorderSide(color: appBorderColor(context))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _BrandHeader(
-            username: username,
-            role: role,
-            project: project,
-          ),
+          _BrandHeader(username: username, role: role, project: project),
           const SizedBox(height: 24),
           for (int i = 0; i < tabs.length; i++)
             _SideNavItem(
@@ -201,10 +192,7 @@ class _BrandHeader extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                project.primaryColor,
-                project.secondaryColor,
-              ],
+              colors: [project.primaryColor, project.secondaryColor],
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
@@ -286,10 +274,7 @@ class _SideNavItem extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 13,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           decoration: BoxDecoration(
             color: selected ? selectedBg : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
@@ -298,15 +283,18 @@ class _SideNavItem extends StatelessWidget {
             children: [
               Icon(
                 tab.icon,
-                color: selected ? selectedColor : appSecondaryTextColor(context),
+                color: selected
+                    ? selectedColor
+                    : appSecondaryTextColor(context),
                 size: 22,
               ),
               const SizedBox(width: 12),
               Text(
                 tab.label,
                 style: TextStyle(
-                  color:
-                      selected ? selectedColor : appSecondaryTextColor(context),
+                  color: selected
+                      ? selectedColor
+                      : appSecondaryTextColor(context),
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
                   decoration: TextDecoration.none,
@@ -341,10 +329,7 @@ class _BottomNavigation extends StatelessWidget {
       decoration: BoxDecoration(
         color: project.cardDarkColor,
         border: const Border(
-          top: BorderSide(
-            color: Color(0xFF1F2937),
-            width: 1,
-          ),
+          top: BorderSide(color: Color(0xFF1F2937), width: 1),
         ),
       ),
       child: Row(
@@ -405,10 +390,7 @@ class _BottomNavItem extends StatelessWidget {
                     ? LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
-                        colors: [
-                          primaryColor,
-                          secondaryColor,
-                        ],
+                        colors: [primaryColor, secondaryColor],
                       )
                     : null,
                 color: selected
@@ -425,11 +407,7 @@ class _BottomNavItem extends StatelessWidget {
                       ]
                     : null,
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 27,
-              ),
+              child: Icon(icon, color: iconColor, size: 27),
             ),
             const SizedBox(height: 6),
             Text(
@@ -532,9 +510,7 @@ class _BroadcastTabPageState extends State<_BroadcastTabPage> {
                       decoration: BoxDecoration(
                         color: appCardBackgroundColor(context),
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(
-                          color: appBorderColor(context),
-                        ),
+                        border: Border.all(color: appBorderColor(context)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

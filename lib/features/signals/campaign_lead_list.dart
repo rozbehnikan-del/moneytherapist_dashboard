@@ -24,9 +24,7 @@ class CampaignLeadList extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(18),
         decoration: _boxDecoration(context),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -152,9 +150,7 @@ class CampaignLeadList extends StatelessWidget {
                 physics: const ClampingScrollPhysics(),
                 itemCount: leads.length,
                 itemBuilder: (context, index) {
-                  return _LeadCard(
-                    lead: leads[index],
-                  );
+                  return _LeadCard(lead: leads[index]);
                 },
               ),
             ),
@@ -168,13 +164,11 @@ class CampaignLeadList extends StatelessWidget {
     return BoxDecoration(
       color: appCardBackgroundColor(context),
       borderRadius: BorderRadius.circular(22),
-      border: Border.all(
-        color: appBorderColor(context),
-      ),
+      border: Border.all(color: appBorderColor(context)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(
-            appIsDarkMode(context) ? 0.18 : 0.035,
+          color: Colors.black.withValues(
+            alpha: appIsDarkMode(context) ? 0.18 : 0.035,
           ),
           blurRadius: 14,
           offset: const Offset(0, 6),
@@ -199,9 +193,7 @@ class CampaignLeadList extends StatelessWidget {
 class _LeadCard extends StatelessWidget {
   final CampaignLeadModel lead;
 
-  const _LeadCard({
-    required this.lead,
-  });
+  const _LeadCard({required this.lead});
 
   @override
   Widget build(BuildContext context) {
@@ -217,9 +209,7 @@ class _LeadCard extends StatelessWidget {
             ? const Color(0xFF0F172A)
             : const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -240,16 +230,9 @@ class _LeadCard extends StatelessWidget {
 
           return Row(
             children: [
-              Expanded(
-                flex: 2,
-                child: _LeadIdentity(lead: lead),
-              ),
-              Expanded(
-                child: _LeadStatus(lead: lead),
-              ),
-              Expanded(
-                child: _LeadMeta(lastMessage: lastMessage),
-              ),
+              Expanded(flex: 2, child: _LeadIdentity(lead: lead)),
+              Expanded(child: _LeadStatus(lead: lead)),
+              Expanded(child: _LeadMeta(lastMessage: lastMessage)),
             ],
           );
         },
@@ -261,9 +244,7 @@ class _LeadCard extends StatelessWidget {
 class _LeadIdentity extends StatelessWidget {
   final CampaignLeadModel lead;
 
-  const _LeadIdentity({
-    required this.lead,
-  });
+  const _LeadIdentity({required this.lead});
 
   @override
   Widget build(BuildContext context) {
@@ -344,9 +325,7 @@ class _LeadIdentity extends StatelessWidget {
 class _LeadStatus extends StatelessWidget {
   final CampaignLeadModel lead;
 
-  const _LeadStatus({
-    required this.lead,
-  });
+  const _LeadStatus({required this.lead});
 
   @override
   Widget build(BuildContext context) {
@@ -418,9 +397,7 @@ class _LeadStatus extends StatelessWidget {
 class _LeadMeta extends StatelessWidget {
   final String lastMessage;
 
-  const _LeadMeta({
-    required this.lastMessage,
-  });
+  const _LeadMeta({required this.lastMessage});
 
   @override
   Widget build(BuildContext context) {

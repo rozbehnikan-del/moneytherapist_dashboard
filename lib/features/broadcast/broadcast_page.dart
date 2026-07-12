@@ -101,7 +101,7 @@ class _BroadcastHeroCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -318,8 +318,8 @@ class _BroadcastHistorySection extends StatelessWidget {
       border: Border.all(color: appBorderColor(context)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(
-            appIsDarkMode(context) ? 0.18 : 0.035,
+          color: Colors.black.withValues(
+            alpha: appIsDarkMode(context) ? 0.18 : 0.035,
           ),
           blurRadius: 14,
           offset: const Offset(0, 6),

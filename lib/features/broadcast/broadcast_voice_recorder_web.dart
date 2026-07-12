@@ -1,4 +1,6 @@
 import 'dart:async';
+// ignore_for_file: deprecated_member_use, avoid_web_libraries_in_flutter
+
 import 'dart:html' as html;
 import 'dart:typed_data';
 
@@ -18,22 +20,16 @@ class BroadcastVoiceRecordingSession {
     this._startedAt,
     this._mimeType,
   ) {
-    _mediaRecorder.addEventListener(
-      'dataavailable',
-      (event) {
-        final data = (event as dynamic).data;
-        if (data != null) {
-          _chunks.add(data);
-        }
-      },
-    );
+    _mediaRecorder.addEventListener('dataavailable', (event) {
+      final data = (event as dynamic).data;
+      if (data != null) {
+        _chunks.add(data);
+      }
+    });
 
-    _mediaRecorder.addEventListener(
-      'stop',
-      (_) {
-        _finish();
-      },
-    );
+    _mediaRecorder.addEventListener('stop', (_) {
+      _finish();
+    });
   }
 
   Future<PickedBroadcastMedia> stop() {
@@ -107,16 +103,15 @@ class BroadcastVoiceRecordingSession {
 Future<BroadcastVoiceRecordingSession> startBroadcastVoiceRecording() async {
   final mediaDevices = html.window.navigator.mediaDevices;
   if (mediaDevices == null) {
-    throw UnsupportedError('Microphone recording is not supported in this browser.');
+    throw UnsupportedError(
+      'Microphone recording is not supported in this browser.',
+    );
   }
 
   final stream = await mediaDevices.getUserMedia({'audio': true});
 
   final mimeType = _bestSupportedMimeType();
-  final recorder = html.MediaRecorder(
-    stream,
-    {'mimeType': mimeType},
-  );
+  final recorder = html.MediaRecorder(stream, {'mimeType': mimeType});
   final session = BroadcastVoiceRecordingSession._(
     recorder,
     stream,

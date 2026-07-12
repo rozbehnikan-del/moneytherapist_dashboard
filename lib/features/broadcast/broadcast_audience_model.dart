@@ -37,10 +37,10 @@ class BroadcastAudiencePreview {
   List<BroadcastAudienceUser> get users => previewUsers;
 
   BroadcastAudienceSummary get summary => BroadcastAudienceSummary(
-        deposited: verifiedRecipients,
-        pending: pendingRecipients,
-        totalDepositAmount: verifiedAmount,
-      );
+    deposited: verifiedRecipients,
+    pending: pendingRecipients,
+    totalDepositAmount: verifiedAmount,
+  );
 
   factory BroadcastAudiencePreview.fromJson(Map<String, dynamic> json) {
     return BroadcastAudiencePreview(
@@ -66,9 +66,10 @@ class BroadcastAudiencePreview {
     if (raw is List) {
       return raw
           .whereType<Map>()
-          .map((item) => BroadcastAudienceUser.fromJson(
-                Map<String, dynamic>.from(item),
-              ))
+          .map(
+            (item) =>
+                BroadcastAudienceUser.fromJson(Map<String, dynamic>.from(item)),
+          )
           .toList();
     }
 

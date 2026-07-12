@@ -1,5 +1,8 @@
+// ignore_for_file: use_null_aware_elements
+
 import 'package:dio/dio.dart';
 
+import '../../config/projects/moneytherapist_config.dart';
 import 'broadcast_audience_model.dart';
 import 'broadcast_model.dart';
 
@@ -10,9 +13,8 @@ class BroadcastService {
 
   // Use /webhook-test while testing n8n manually.
   // Change to /webhook after workflows are active/production.
-  static const String _baseUrl = 'https://sizin8n.launchman.xyz/webhook';
-  static const String _testBaseUrl =
-      'https://sizin8n.launchman.xyz/webhook-test';
+  static final String _baseUrl = moneyTherapistConfig.apiEndpoints.baseUrl;
+  static final String _testBaseUrl = '$_baseUrl-test';
 
   Future<BroadcastAudiencePreview> previewAudience({
     int? campaignId,
@@ -64,7 +66,8 @@ class BroadcastService {
         'scheduled_at': scheduledAt?.toUtc().toIso8601String(),
         'created_by_username': createdByUsername.replaceAll('@', '').trim(),
         'admin_username': createdByUsername.replaceAll('@', '').trim(),
-        if (createdByTelegramId != null) 'admin_telegram_id': createdByTelegramId,
+        if (createdByTelegramId != null)
+          'admin_telegram_id': createdByTelegramId,
         if (_hasValue(mediaUrl)) 'media_url': mediaUrl!.trim(),
         if (_hasValue(mediaFileId)) 'media_file_id': mediaFileId!.trim(),
         if (_hasValue(mediaCaption)) 'media_caption': mediaCaption!.trim(),
@@ -91,7 +94,7 @@ class BroadcastService {
     String? caption,
   }) async {
     final response = await _postMediaUploadWithFallback(
-      urls: const [
+      urls: [
         '$_baseUrl/moneytherapist-media-upload',
         '$_testBaseUrl/moneytherapist-media-upload',
       ],
@@ -204,13 +207,28 @@ class BroadcastService {
 
     final data = response.data;
     if (data is List) {
-      return data.whereType<Map>().map((item) => BroadcastModel.fromJson(Map<String, dynamic>.from(item))).toList();
+      return data
+          .whereType<Map>()
+          .map(
+            (item) => BroadcastModel.fromJson(Map<String, dynamic>.from(item)),
+          )
+          .toList();
     }
     if (data is Map && data['broadcasts'] is List) {
-      return (data['broadcasts'] as List).whereType<Map>().map((item) => BroadcastModel.fromJson(Map<String, dynamic>.from(item))).toList();
+      return (data['broadcasts'] as List)
+          .whereType<Map>()
+          .map(
+            (item) => BroadcastModel.fromJson(Map<String, dynamic>.from(item)),
+          )
+          .toList();
     }
     if (data is Map && data['data'] is List) {
-      return (data['data'] as List).whereType<Map>().map((item) => BroadcastModel.fromJson(Map<String, dynamic>.from(item))).toList();
+      return (data['data'] as List)
+          .whereType<Map>()
+          .map(
+            (item) => BroadcastModel.fromJson(Map<String, dynamic>.from(item)),
+          )
+          .toList();
     }
     throw Exception('Invalid broadcast history response');
   }
@@ -228,7 +246,9 @@ class BroadcastService {
   bool _hasValue(String? value) {
     if (value == null) return false;
     final text = value.trim();
-    return text.isNotEmpty && text.toLowerCase() != 'null' && text.toLowerCase() != 'undefined';
+    return text.isNotEmpty &&
+        text.toLowerCase() != 'null' &&
+        text.toLowerCase() != 'undefined';
   }
 
   BroadcastModel? _readBroadcast(dynamic data) {

@@ -1,40 +1,38 @@
 import 'package:dio/dio.dart';
 
+import '../../config/project_config.dart';
 import 'dashboard_models.dart';
 
 class DashboardService {
   final Dio _dio;
+  final ApiEndpoints _apiEndpoints;
 
-  DashboardService(this._dio);
+  DashboardService(this._dio, ProjectConfig project)
+    : _apiEndpoints = project.apiEndpoints;
 
-  static const String _dashboardUrl =
-      'https://sizin8n.launchman.xyz/webhook/moneytherapist-dashboard-summary';
+  DashboardService.withEndpoints(
+    this._dio, {
+    required ApiEndpoints apiEndpoints,
+  }) : _apiEndpoints = apiEndpoints;
 
   Future<DashboardData> fetchDashboard() async {
     final response = await _dio.get(
-      _dashboardUrl,
-      queryParameters: {
-        't': DateTime.now().millisecondsSinceEpoch,
-      },
+      _apiEndpoints.dashboardSummary,
+      queryParameters: {'t': DateTime.now().millisecondsSinceEpoch},
       options: Options(
         responseType: ResponseType.json,
-        headers: {
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache',
-        },
-        sendTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 20),
+        headers: {'Cache-Control': 'no-cache'},
       ),
     );
 
     final data = response.data;
 
     if (data is! Map) {
-      throw Exception('Invalid dashboard response: response is not JSON object');
+      throw Exception(
+        'Invalid dashboard response: response is not JSON object',
+      );
     }
 
-    return DashboardData.fromJson(
-      Map<String, dynamic>.from(data),
-    );
+    return DashboardData.fromJson(Map<String, dynamic>.from(data));
   }
 }

@@ -6,10 +6,7 @@ import '../dashboard_models.dart';
 class FunnelCard extends StatelessWidget {
   final FunnelData funnel;
 
-  const FunnelCard({
-    super.key,
-    required this.funnel,
-  });
+  const FunnelCard({super.key, required this.funnel});
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +33,7 @@ class FunnelCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _FunnelStep(
-            title: 'Started',
-            value: funnel.start,
-            rate: 1,
-          ),
+          _FunnelStep(title: 'Started', value: funnel.start, rate: 1),
           _FunnelStep(
             title: 'Onboarded',
             value: funnel.onboarded,
@@ -49,12 +42,16 @@ class FunnelCard extends StatelessWidget {
           _FunnelStep(
             title: 'Intro Sent',
             value: funnel.introSent,
-            rate: funnel.onboarded == 0 ? 0 : funnel.introSent / funnel.onboarded,
+            rate: funnel.onboarded == 0
+                ? 0
+                : funnel.introSent / funnel.onboarded,
           ),
           _FunnelStep(
             title: 'Verified',
             value: funnel.verified,
-            rate: funnel.introSent == 0 ? 0 : funnel.verified / funnel.introSent,
+            rate: funnel.introSent == 0
+                ? 0
+                : funnel.verified / funnel.introSent,
           ),
         ],
       ),
@@ -139,9 +136,7 @@ class _FunnelStep extends StatelessWidget {
 class _Panel extends StatelessWidget {
   final Widget child;
 
-  const _Panel({
-    required this.child,
-  });
+  const _Panel({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -151,13 +146,11 @@ class _Panel extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.04,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.04,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),

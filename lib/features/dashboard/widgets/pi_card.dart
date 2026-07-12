@@ -23,13 +23,11 @@ class KpiCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.04,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.04,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),

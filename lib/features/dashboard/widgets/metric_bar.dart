@@ -6,11 +6,7 @@ class MetricBar extends StatelessWidget {
   final String label;
   final double value;
 
-  const MetricBar({
-    super.key,
-    required this.label,
-    required this.value,
-  });
+  const MetricBar({super.key, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +35,10 @@ class MetricBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: clamped,
                 minHeight: 12,
-                backgroundColor:
-                    dark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
-                valueColor: const AlwaysStoppedAnimation(
-                  Color(0xFF2563EB),
-                ),
+                backgroundColor: dark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFE5E7EB),
+                valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
               ),
             ),
           ),

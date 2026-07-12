@@ -8,10 +8,7 @@ import '../features/auth/admin_gate.dart';
 class SplashPage extends StatefulWidget {
   final ProjectConfig project;
 
-  const SplashPage({
-    super.key,
-    required this.project,
-  });
+  const SplashPage({super.key, required this.project});
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -28,9 +25,7 @@ class _SplashPageState extends State<SplashPage> {
       if (!mounted) return;
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => AdminGate(project: widget.project),
-        ),
+        MaterialPageRoute(builder: (_) => AdminGate(project: widget.project)),
       );
     });
   }
@@ -46,7 +41,9 @@ class _SplashPageState extends State<SplashPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF6F8FB),
+      backgroundColor: isDark
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF6F8FB),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -63,7 +60,9 @@ class _SplashPageState extends State<SplashPage> {
                     borderRadius: BorderRadius.circular(36),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.22 : 0.08),
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.22 : 0.08,
+                        ),
                         blurRadius: 28,
                         offset: const Offset(0, 14),
                       ),

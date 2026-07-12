@@ -1,6 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../config/project_config.dart';
+import '../../core/networking/dio_factory.dart';
 import 'admin_access_model.dart';
 import 'admin_access_service.dart';
 import '../home/main_shell_page.dart';
@@ -8,10 +8,7 @@ import '../home/main_shell_page.dart';
 class AdminGate extends StatefulWidget {
   final ProjectConfig project;
 
-  const AdminGate({
-    super.key,
-    required this.project,
-  });
+  const AdminGate({super.key, required this.project});
 
   @override
   State<AdminGate> createState() => _AdminGateState();
@@ -24,7 +21,10 @@ class _AdminGateState extends State<AdminGate> {
   @override
   void initState() {
     super.initState();
-    _service = AdminAccessService(Dio(), widget.project);
+    _service = AdminAccessService(
+      DioFactory.create(widget.project),
+      widget.project,
+    );
     _futureAccess = _service.checkAccess();
   }
 
@@ -76,9 +76,7 @@ class _AdminLoadingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Color(0xFFF6F8FB),
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }
@@ -87,10 +85,7 @@ class _AdminErrorScreen extends StatelessWidget {
   final String error;
   final Future<void> Function() onRetry;
 
-  const _AdminErrorScreen({
-    required this.error,
-    required this.onRetry,
-  });
+  const _AdminErrorScreen({required this.error, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -127,9 +122,7 @@ class _AdminErrorScreen extends StatelessWidget {
                 Text(
                   error,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
-                  ),
+                  style: const TextStyle(color: Color(0xFF6B7280)),
                 ),
                 const SizedBox(height: 18),
                 FilledButton.icon(
@@ -149,9 +142,7 @@ class _AdminErrorScreen extends StatelessWidget {
 class _AccessDeniedScreen extends StatelessWidget {
   final Future<void> Function() onRetry;
 
-  const _AccessDeniedScreen({
-    required this.onRetry,
-  });
+  const _AccessDeniedScreen({required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -188,10 +179,7 @@ class _AccessDeniedScreen extends StatelessWidget {
                 const Text(
                   'This control panel is only available for approved Telegram admins.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFF6B7280),
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: Color(0xFF6B7280), height: 1.4),
                 ),
                 const SizedBox(height: 18),
                 OutlinedButton.icon(

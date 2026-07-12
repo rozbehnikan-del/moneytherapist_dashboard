@@ -22,12 +22,7 @@ final mockDashboardData = DashboardData(
     hotPending48h: 0,
     churnRisk14d: 0,
   ),
-  funnel: const FunnelData(
-    start: 2,
-    onboarded: 2,
-    introSent: 2,
-    verified: 1,
-  ),
+  funnel: const FunnelData(start: 2, onboarded: 2, introSent: 2, verified: 1),
   value: const ValueData(
     totalAmount: 1200.15,
     totalVerified: 1200.15,

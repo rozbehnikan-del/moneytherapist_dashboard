@@ -104,13 +104,19 @@ class BroadcastModel {
   static bool _hasValue(String? value) {
     if (value == null) return false;
     final text = value.trim();
-    return text.isNotEmpty && text.toLowerCase() != 'null' && text.toLowerCase() != 'undefined';
+    return text.isNotEmpty &&
+        text.toLowerCase() != 'null' &&
+        text.toLowerCase() != 'undefined';
   }
 
   static String? _cleanNullable(dynamic value) {
     if (value == null) return null;
     final text = value.toString().trim();
-    if (text.isEmpty || text.toLowerCase() == 'null' || text.toLowerCase() == 'undefined') return null;
+    if (text.isEmpty ||
+        text.toLowerCase() == 'null' ||
+        text.toLowerCase() == 'undefined') {
+      return null;
+    }
     return text;
   }
 
@@ -118,7 +124,9 @@ class BroadcastModel {
     if (value == null) return fallback;
     if (value is int) return value;
     if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? double.tryParse(value)?.toInt() ?? fallback;
+    if (value is String) {
+      return int.tryParse(value) ?? double.tryParse(value)?.toInt() ?? fallback;
+    }
     return fallback;
   }
 
@@ -126,7 +134,9 @@ class BroadcastModel {
     if (value == null) return null;
     if (value is int) return value;
     if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? double.tryParse(value)?.toInt();
+    if (value is String) {
+      return int.tryParse(value) ?? double.tryParse(value)?.toInt();
+    }
     return null;
   }
 

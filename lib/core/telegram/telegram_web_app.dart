@@ -169,9 +169,6 @@ class TelegramWebApp {
   }
 }
 
-@JS('Object')
-external JSObject get _objectConstructor;
-
 extension _JSObjectHelpers on JSObject {
   external JSAny? operator [](String key);
 }

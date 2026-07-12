@@ -8,10 +8,7 @@ import '../dashboard_models.dart';
 class EmployerReportCard extends StatelessWidget {
   final DashboardData data;
 
-  const EmployerReportCard({
-    super.key,
-    required this.data,
-  });
+  const EmployerReportCard({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +46,7 @@ class EmployerReportCard extends StatelessWidget {
 
           _ReportGrid(
             children: [
-              _ReportRow(
-                label: 'Total Users',
-                value: '$total',
-              ),
+              _ReportRow(label: 'Total Users', value: '$total'),
               _ReportRow(
                 label: 'Verified Deposits',
                 value: '$verified (${_percent(data.rates.conversion)})',
@@ -94,51 +88,24 @@ class EmployerReportCard extends StatelessWidget {
 
           const SizedBox(height: 22),
 
-          const _SectionTitle(
-            icon: Icons.speed_rounded,
-            title: 'Metrics',
-          ),
+          const _SectionTitle(icon: Icons.speed_rounded, title: 'Metrics'),
           const SizedBox(height: 12),
 
-          _MetricLine(
-            label: 'Engagement 7d',
-            value: data.rates.engagement7d,
-          ),
-          _MetricLine(
-            label: 'Conversion',
-            value: data.rates.conversion,
-          ),
-          _MetricLine(
-            label: 'Email',
-            value: data.rates.email,
-          ),
-          _MetricLine(
-            label: 'Qualified ≥300',
-            value: data.rates.qualified300,
-          ),
+          _MetricLine(label: 'Engagement 7d', value: data.rates.engagement7d),
+          _MetricLine(label: 'Conversion', value: data.rates.conversion),
+          _MetricLine(label: 'Email', value: data.rates.email),
+          _MetricLine(label: 'Qualified ≥300', value: data.rates.qualified300),
           _MetricLine(
             label: 'Hot Pending 48h',
             value: data.rates.hotPending48h,
           ),
-          _MetricLine(
-            label: 'Churn Risk 14d',
-            value: data.rates.churnRisk14d,
-          ),
-          _MetricLine(
-            label: 'Retention W1',
-            value: data.rates.retentionW1,
-          ),
-          _MetricLine(
-            label: 'Retention M1',
-            value: data.rates.retentionM1,
-          ),
+          _MetricLine(label: 'Churn Risk 14d', value: data.rates.churnRisk14d),
+          _MetricLine(label: 'Retention W1', value: data.rates.retentionW1),
+          _MetricLine(label: 'Retention M1', value: data.rates.retentionM1),
 
           const SizedBox(height: 22),
 
-          const _SectionTitle(
-            icon: Icons.filter_alt_rounded,
-            title: 'Funnel',
-          ),
+          const _SectionTitle(icon: Icons.filter_alt_rounded, title: 'Funnel'),
           const SizedBox(height: 12),
 
           _FunnelReport(data: data),
@@ -219,10 +186,7 @@ class EmployerReportCard extends StatelessWidget {
 
           const SizedBox(height: 22),
 
-          const _SectionTitle(
-            icon: Icons.repeat_rounded,
-            title: 'Retention',
-          ),
+          const _SectionTitle(icon: Icons.repeat_rounded, title: 'Retention'),
           const SizedBox(height: 10),
 
           _ReportGrid(
@@ -246,10 +210,7 @@ class EmployerReportCard extends StatelessWidget {
     );
   }
 
-  static int _countFromRate({
-    required int total,
-    required double rate,
-  }) {
+  static int _countFromRate({required int total, required double rate}) {
     return (total * rate).round();
   }
 
@@ -267,20 +228,13 @@ class _SectionTitle extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _SectionTitle({
-    required this.icon,
-    required this.title,
-  });
+  const _SectionTitle({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: const Color(0xFF2563EB),
-        ),
+        Icon(icon, size: 18, color: const Color(0xFF2563EB)),
         const SizedBox(width: 8),
         Text(
           title,
@@ -299,9 +253,7 @@ class _SectionTitle extends StatelessWidget {
 class _ReportGrid extends StatelessWidget {
   final List<Widget> children;
 
-  const _ReportGrid({
-    required this.children,
-  });
+  const _ReportGrid({required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -310,9 +262,7 @@ class _ReportGrid extends StatelessWidget {
         final isWide = constraints.maxWidth > 720;
 
         if (!isWide) {
-          return Column(
-            children: children,
-          );
+          return Column(children: children);
         }
 
         return Wrap(
@@ -336,10 +286,7 @@ class _ReportRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _ReportRow({
-    required this.label,
-    required this.value,
-  });
+  const _ReportRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -347,16 +294,11 @@ class _ReportRow extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 12,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: dark ? const Color(0xFF0F172A) : const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Row(
         children: [
@@ -395,10 +337,7 @@ class _MetricLine extends StatelessWidget {
   final String label;
   final double value;
 
-  const _MetricLine({
-    required this.label,
-    required this.value,
-  });
+  const _MetricLine({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -428,11 +367,10 @@ class _MetricLine extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: clamped,
                 minHeight: 12,
-                backgroundColor:
-                    dark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
-                valueColor: const AlwaysStoppedAnimation(
-                  Color(0xFF2563EB),
-                ),
+                backgroundColor: dark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFE5E7EB),
+                valueColor: const AlwaysStoppedAnimation(Color(0xFF2563EB)),
               ),
             ),
           ),
@@ -459,9 +397,7 @@ class _MetricLine extends StatelessWidget {
 class _FunnelReport extends StatelessWidget {
   final DashboardData data;
 
-  const _FunnelReport({
-    required this.data,
-  });
+  const _FunnelReport({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -479,8 +415,9 @@ class _FunnelReport extends StatelessWidget {
             color: appDarkPreviewColor(context),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color:
-                  appIsDarkMode(context) ? Colors.white12 : Colors.transparent,
+              color: appIsDarkMode(context)
+                  ? Colors.white12
+                  : Colors.transparent,
             ),
           ),
           child: Column(
@@ -537,10 +474,7 @@ class _FunnelNumber extends StatelessWidget {
   final String label;
   final int value;
 
-  const _FunnelNumber({
-    required this.label,
-    required this.value,
-  });
+  const _FunnelNumber({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -575,9 +509,7 @@ class _FunnelNumber extends StatelessWidget {
 class _RecommendedActionBox extends StatelessWidget {
   final DashboardData data;
 
-  const _RecommendedActionBox({
-    required this.data,
-  });
+  const _RecommendedActionBox({required this.data});
 
   @override
   Widget build(BuildContext context) {

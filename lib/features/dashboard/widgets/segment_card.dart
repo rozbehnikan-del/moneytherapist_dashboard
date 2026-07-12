@@ -6,10 +6,7 @@ import '../dashboard_models.dart';
 class SegmentCard extends StatelessWidget {
   final SegmentData segments;
 
-  const SegmentCard({
-    super.key,
-    required this.segments,
-  });
+  const SegmentCard({super.key, required this.segments});
 
   @override
   Widget build(BuildContext context) {
@@ -88,16 +85,11 @@ class _SegmentRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: dark ? const Color(0xFF0F172A) : const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: const Color(0xFF2563EB),
-          ),
+          Icon(icon, color: const Color(0xFF2563EB)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -127,9 +119,7 @@ class _SegmentRow extends StatelessWidget {
 class _Panel extends StatelessWidget {
   final Widget child;
 
-  const _Panel({
-    required this.child,
-  });
+  const _Panel({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -139,13 +129,11 @@ class _Panel extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.04,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.04,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),

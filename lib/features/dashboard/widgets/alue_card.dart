@@ -7,10 +7,7 @@ import '../dashboard_models.dart';
 class ValueCard extends StatelessWidget {
   final ValueData value;
 
-  const ValueCard({
-    super.key,
-    required this.value,
-  });
+  const ValueCard({super.key, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +52,7 @@ class ValueCard extends StatelessWidget {
             label: 'P90 Verified',
             value: currency.format(value.p90Verified),
           ),
-          _RowItem(
-            label: 'Qualified ≥500',
-            value: '${value.qualified500}',
-          ),
+          _RowItem(label: 'Qualified ≥500', value: '${value.qualified500}'),
         ],
       ),
     );
@@ -69,10 +63,7 @@ class _RowItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _RowItem({
-    required this.label,
-    required this.value,
-  });
+  const _RowItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +98,7 @@ class _RowItem extends StatelessWidget {
 class _Panel extends StatelessWidget {
   final Widget child;
 
-  const _Panel({
-    required this.child,
-  });
+  const _Panel({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -119,13 +108,11 @@ class _Panel extends StatelessWidget {
       decoration: BoxDecoration(
         color: appCardBackgroundColor(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: appBorderColor(context),
-        ),
+        border: Border.all(color: appBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
-              appIsDarkMode(context) ? 0.18 : 0.04,
+            color: Colors.black.withValues(
+              alpha: appIsDarkMode(context) ? 0.18 : 0.04,
             ),
             blurRadius: 18,
             offset: const Offset(0, 8),
