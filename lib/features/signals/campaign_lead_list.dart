@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/app_form_styles.dart';
-import 'campaign_lead_model.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 class CampaignLeadList extends StatelessWidget {
   final List<CampaignLeadModel> leads;

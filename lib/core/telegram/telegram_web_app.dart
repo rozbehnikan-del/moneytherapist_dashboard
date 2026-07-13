@@ -1,5 +1,7 @@
 import 'dart:js_interop';
 
+import 'package:dashboard_core/dashboard_core.dart';
+
 @JS('window.Telegram.WebApp')
 external JSObject? get _telegramWebApp;
 
@@ -166,6 +168,32 @@ class TelegramWebApp {
     } catch (_) {
       return null;
     }
+  }
+}
+
+class TelegramWebAppContext implements TelegramContext {
+  final TelegramWebApp webApp;
+
+  const TelegramWebAppContext(this.webApp);
+
+  @override
+  String get initData => webApp.initData;
+
+  @override
+  bool get isDarkMode => webApp.isDarkMode;
+
+  @override
+  TelegramUserData? get user {
+    final appUser = webApp.user;
+    final id = appUser?.id;
+    if (appUser == null || id == null) return null;
+
+    return TelegramUserData(
+      id: id,
+      firstName: appUser.firstName,
+      lastName: appUser.lastName,
+      username: appUser.username,
+    );
   }
 }
 

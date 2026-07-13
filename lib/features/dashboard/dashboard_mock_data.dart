@@ -1,4 +1,4 @@
-import 'dashboard_models.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 final mockDashboardData = DashboardData(
   timestamp: DateTime(2026, 5, 30, 21, 3, 59),

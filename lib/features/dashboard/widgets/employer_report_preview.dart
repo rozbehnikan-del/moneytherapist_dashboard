@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../app/app_form_styles.dart';
 import '../../../app/dashboard_card.dart';
-import '../dashboard_models.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 class EmployerReportCard extends StatelessWidget {
   final DashboardData data;

@@ -1,12 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/dashboard_card.dart';
 import '../../app/app_form_styles.dart';
-import '../../config/project_config.dart';
-import 'dashboard_models.dart';
-import 'dashboard_service.dart';
 import 'widgets/action_card.dart';
 import 'widgets/alue_card.dart';
 import 'widgets/dashboard_summary_chart.dart';

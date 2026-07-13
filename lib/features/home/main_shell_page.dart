@@ -1,14 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/app_form_styles.dart';
-import '../../config/project_config.dart';
 import '../broadcast/broadcast_page.dart';
-import '../broadcast/broadcast_service.dart';
 import '../dashboard/dashboard_page.dart';
 import '../signals/signals_page.dart';
-import '../signals/campaign_model.dart';
-import '../signals/signal_service.dart';
 
 class MainShellPage extends StatefulWidget {
   final ProjectConfig project;

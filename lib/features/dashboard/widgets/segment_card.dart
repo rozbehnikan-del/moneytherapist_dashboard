@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/app_form_styles.dart';
-import '../dashboard_models.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 class SegmentCard extends StatelessWidget {
   final SegmentData segments;

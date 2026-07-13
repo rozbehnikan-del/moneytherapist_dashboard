@@ -1,7 +1,7 @@
+import 'package:dashboard_core/dashboard_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../config/project_config.dart';
 import '../core/telegram/telegram_web_app.dart';
 import 'splash_page.dart';
 

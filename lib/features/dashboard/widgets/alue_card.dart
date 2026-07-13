@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../app/app_form_styles.dart';
-import '../dashboard_models.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 class ValueCard extends StatelessWidget {
   final ValueData value;

@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 import '../../app/app_form_styles.dart';
 import '../broadcast/broadcast_page.dart';
-import '../broadcast/broadcast_service.dart';
 import 'campaign_card.dart';
 import 'campaign_lead_list.dart';
-import 'campaign_lead_model.dart';
-import 'campaign_model.dart';
 import 'create_campaign_sheet.dart';
 import 'create_signal_sheet.dart';
-import 'signal_model.dart';
-import 'signal_service.dart';
 
 class SignalsPage extends StatefulWidget {
   final SignalService signalService;

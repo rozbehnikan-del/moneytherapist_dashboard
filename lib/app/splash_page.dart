@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:dashboard_core/dashboard_core.dart';
 import 'package:flutter/material.dart';
 
-import '../config/project_config.dart';
 import '../features/auth/admin_gate.dart';
 
 class SplashPage extends StatefulWidget {

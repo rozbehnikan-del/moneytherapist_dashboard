@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 import 'package:flutter/material.dart';
-import '../../config/project_config.dart';
-import '../../core/networking/dio_factory.dart';
-import 'admin_access_model.dart';
-import 'admin_access_service.dart';
+
+import '../../core/telegram/telegram_web_app.dart';
 import '../home/main_shell_page.dart';
 
 class AdminGate extends StatefulWidget {
@@ -24,7 +23,11 @@ class _AdminGateState extends State<AdminGate> {
   void initState() {
     super.initState();
     _dio = DioFactory.create(widget.project);
-    _service = AdminAccessService(_dio, widget.project);
+    _service = AdminAccessService(
+      _dio,
+      widget.project,
+      telegramContext: TelegramWebAppContext(TelegramWebApp.instance),
+    );
     _futureAccess = _service.checkAccess();
   }
 

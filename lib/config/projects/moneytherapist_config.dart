@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../project_config.dart';
+import 'package:dashboard_core/dashboard_core.dart';
 
 const ProjectConfig moneyTherapistConfig = ProjectConfig(
   id: 'moneytherapist',
