@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../app/app_form_styles.dart';
-import '../../../app/dashboard_card.dart';
 import 'package:dashboard_core/dashboard_core.dart';
 
 class EmployerReportCard extends StatelessWidget {

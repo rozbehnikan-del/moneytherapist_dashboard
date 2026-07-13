@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../app/app_form_styles.dart';
 import 'package:dashboard_core/dashboard_core.dart';
 
 class CampaignCard extends StatelessWidget {

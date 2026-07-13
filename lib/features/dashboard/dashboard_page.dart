@@ -3,16 +3,7 @@ import 'package:dashboard_core/dashboard_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../app/dashboard_card.dart';
-import '../../app/app_form_styles.dart';
-import 'widgets/action_card.dart';
-import 'widgets/alue_card.dart';
-import 'widgets/dashboard_summary_chart.dart';
 import 'widgets/employer_report_preview.dart';
-import 'widgets/funnel_card.dart';
-import 'widgets/metric_bar.dart';
-import 'widgets/pi_card.dart';
-import 'widgets/segment_card.dart';
 
 class DashboardPage extends StatefulWidget {
   final ProjectConfig project;
