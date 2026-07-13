@@ -5,6 +5,9 @@ import 'package:dashboard_core/dashboard_core.dart';
 @JS('window.Telegram.WebApp')
 external JSObject? get _telegramWebApp;
 
+@JS('window.moneyTherapistLockTelegramSwipe')
+external JSFunction? get _lockTelegramSwipeFunction;
+
 class TelegramUser {
   final int? id;
   final String? firstName;
@@ -49,8 +52,10 @@ class TelegramWebApp {
       if (_webApp == null) return;
 
       _call('ready');
-      _call('enableVerticalSwipes');
-      _call('disableClosingConfirmation');
+      _call('expand');
+      _call('disableVerticalSwipes');
+      _call('enableClosingConfirmation');
+      _lockTelegramSwipe();
     } catch (_) {
       _webApp = null;
     }
@@ -141,12 +146,19 @@ class TelegramWebApp {
 
   void expand() {
     _call('expand');
+    _lockTelegramSwipe();
   }
 
   void _call(String method) {
     try {
       if (_webApp == null) return;
       _callMethod(_webApp!, method, []);
+    } catch (_) {}
+  }
+
+  void _lockTelegramSwipe() {
+    try {
+      _lockTelegramSwipeFunction?.callAsFunction();
     } catch (_) {}
   }
 

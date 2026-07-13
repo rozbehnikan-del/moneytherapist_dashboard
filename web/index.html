@@ -29,6 +29,110 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    (function () {
+      function postTelegramEvent(eventType, eventData) {
+        const payload = { eventType: eventType, eventData: eventData };
+
+        try {
+          if (
+            window.Telegram &&
+            window.Telegram.WebView &&
+            typeof window.Telegram.WebView.postEvent === 'function'
+          ) {
+            window.Telegram.WebView.postEvent(eventType, false, eventData);
+            return;
+          }
+        } catch (_) {}
+
+        try {
+          if (
+            window.TelegramWebviewProxy &&
+            typeof window.TelegramWebviewProxy.postEvent === 'function'
+          ) {
+            window.TelegramWebviewProxy.postEvent(
+              eventType,
+              JSON.stringify(eventData)
+            );
+            return;
+          }
+        } catch (_) {}
+
+        try {
+          if (
+            window.webkit &&
+            window.webkit.messageHandlers &&
+            window.webkit.messageHandlers.TelegramWebviewProxy
+          ) {
+            window.webkit.messageHandlers.TelegramWebviewProxy.postMessage(
+              JSON.stringify(payload)
+            );
+            return;
+          }
+        } catch (_) {}
+
+        try {
+          if (window.parent) {
+            window.parent.postMessage(JSON.stringify(payload), '*');
+          }
+        } catch (_) {}
+      }
+
+      function lockTelegramSwipe() {
+        const webApp = window.Telegram && window.Telegram.WebApp;
+
+        if (webApp) {
+          try {
+            webApp.ready();
+            webApp.expand();
+          } catch (_) {}
+
+          try {
+            if (typeof webApp.disableVerticalSwipes === 'function') {
+              webApp.disableVerticalSwipes();
+            }
+          } catch (_) {}
+
+          try {
+            if (typeof webApp.enableClosingConfirmation === 'function') {
+              webApp.enableClosingConfirmation();
+            }
+          } catch (_) {}
+        }
+
+        postTelegramEvent('web_app_setup_swipe_behavior', {
+          allow_vertical_swipe: false
+        });
+      }
+
+      window.moneyTherapistLockTelegramSwipe = lockTelegramSwipe;
+
+      lockTelegramSwipe();
+      window.addEventListener('load', lockTelegramSwipe);
+      window.addEventListener('focus', lockTelegramSwipe);
+      window.addEventListener('resize', lockTelegramSwipe);
+      window.setTimeout(lockTelegramSwipe, 250);
+      window.setTimeout(lockTelegramSwipe, 1000);
+      window.setTimeout(lockTelegramSwipe, 2500);
+    })();
+  </script>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+      -webkit-overflow-scrolling: auto;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+    }
+  </style>
 
   <title>money_therapist_dashboard</title>
   <link rel="manifest" href="manifest.json">
